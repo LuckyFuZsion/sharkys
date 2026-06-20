@@ -2,14 +2,14 @@
 
 import { useRef, useEffect, useState } from "react"
 import { Star, ExternalLink, Facebook } from "lucide-react"
+import { tripAdvisorMeta } from "@/lib/data"
 
 export default function TripAdvisorRating() {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
-  // TripAdvisor data (reverted to original)
-  const tripAdvisorRating = 4.5
-  const tripAdvisorReviewCount = 247
+  const tripAdvisorRating = tripAdvisorMeta.rating
+  const tripAdvisorReviewCount = tripAdvisorMeta.reviewCount
 
   // Facebook data (new)
   const facebookRecommendPercent = 98

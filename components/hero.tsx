@@ -55,8 +55,8 @@ export default function Hero() {
           </span>
         </h1>
         <p className="text-xl md:text-2xl mb-6 max-w-2xl text-shadow animate-fade-in-up animation-delay-200">
-          A friendly bar with a warm atmosphere overlooking Marina de Albufeira. Enjoy live sports, freshly made food,
-          and cocktails!
+          Waterfront sports bar at Marina de Albufeira. Breakfast, live sports on multiple screens, and handcrafted
+          cocktails with stunning marina views.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
           <a href="#menu" aria-label="View our food and drinks menu">

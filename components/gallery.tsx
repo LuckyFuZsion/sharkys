@@ -6,138 +6,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
-
-// Gallery items with real images from Sharky's Bar
-const galleryItems = [
-  {
-    id: 1,
-    type: "image",
-    src: "/images/outdoor-deck.jpg",
-    alt: "Sharky's Bar outdoor deck with marina view",
-    thumbnail: "/images/outdoor-deck.jpg",
-  },
-  {
-    id: 2,
-    type: "image",
-    src: "/images/interior-tables.jpg",
-    alt: "Interior of Sharky's Bar with barrel tables",
-    thumbnail: "/images/interior-tables.jpg",
-  },
-  {
-    id: 3,
-    type: "image",
-    src: "/images/bar-night.jpg",
-    alt: "Bar area at night with blue lighting",
-    thumbnail: "/images/bar-night.jpg",
-  },
-  {
-    id: 4,
-    type: "image",
-    src: "/images/marina-view.jpg",
-    alt: "Beautiful view of Marina de Albufeira",
-    thumbnail: "/images/marina-view.jpg",
-  },
-  {
-    id: 5,
-    type: "image",
-    src: "/images/gourmet-burgers.jpg",
-    alt: "Gourmet burgers with all the trimmings",
-    thumbnail: "/images/gourmet-burgers.jpg",
-  },
-  {
-    id: 6,
-    type: "image",
-    src: "/images/mushroom-burger.jpg",
-    alt: "Mushroom and cheese burger",
-    thumbnail: "/images/mushroom-burger.jpg",
-  },
-  {
-    id: 7,
-    type: "image",
-    src: "/images/fish-finger-sandwich.jpg",
-    alt: "Fish finger sandwich with tartar sauce",
-    thumbnail: "/images/fish-finger-sandwich.jpg",
-  },
-  {
-    id: 8,
-    type: "image",
-    src: "/images/club-sandwich.jpg",
-    alt: "Club sandwich with chips",
-    thumbnail: "/images/club-sandwich.jpg",
-  },
-  {
-    id: 9,
-    type: "image",
-    src: "/images/grilled-cheese.jpg",
-    alt: "Grilled cheese and ham sandwich",
-    thumbnail: "/images/grilled-cheese.jpg",
-  },
-  {
-    id: 10,
-    type: "image",
-    src: "/images/chicken-wrap.jpg",
-    alt: "Chicken wrap with fries",
-    thumbnail: "/images/chicken-wrap.jpg",
-  },
-  {
-    id: 11,
-    type: "image",
-    src: "/images/chicken-salad.jpg",
-    alt: "Fresh chicken salad bowl",
-    thumbnail: "/images/chicken-salad.jpg",
-  },
-  {
-    id: 12,
-    type: "image",
-    src: "/images/cheese-sandwich.jpg",
-    alt: "Cheese sandwich with chips",
-    thumbnail: "/images/cheese-sandwich.jpg",
-  },
-  {
-    id: 13,
-    type: "image",
-    src: "/images/garlic-bread.jpg",
-    alt: "Freshly made garlic bread",
-    thumbnail: "/images/garlic-bread.jpg",
-  },
-  {
-    id: 14,
-    type: "image",
-    src: "/images/loaded-nachos.jpg",
-    alt: "Loaded nachos with melted cheese",
-    thumbnail: "/images/loaded-nachos.jpg",
-  },
-  {
-    id: 15,
-    type: "image",
-    src: "/images/spicy-prawns.jpg",
-    alt: "Spicy prawns in a skillet",
-    thumbnail: "/images/spicy-prawns.jpg",
-  },
-  {
-    id: 16,
-    type: "image",
-    src: "/images/hot-dogs.jpg",
-    alt: "Hot dogs with toppings",
-    thumbnail: "/images/hot-dogs.jpg",
-  },
-  {
-    id: 17,
-    type: "image",
-    src: "/images/wedding-promo.jpg",
-    alt: "Wedding events at Sharky's Bar",
-    thumbnail: "/images/wedding-promo.jpg",
-  },
-  {
-    id: 18,
-    type: "video",
-    src: "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/sharkys/vidtour_lodef1-9MiJlAuJ6cJ9am0TrFqbxcFGEMasmX.mp4",
-    thumbnail: "/interior.jpg",
-    alt: "Video tour of Sharky's Bar",
-  },
-]
+import { DEFAULT_GALLERY_ITEMS } from "@/lib/gallery-defaults"
+import type { GalleryItem } from "@/lib/gallery-types"
 
 export default function Gallery() {
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(DEFAULT_GALLERY_ITEMS)
   const [selectedItem, setSelectedItem] = useState<number | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -153,6 +26,19 @@ export default function Gallery() {
   useEffect(() => {
     setCurrentPage(0)
   }, [isMobile])
+
+  useEffect(() => {
+    fetch("/api/gallery")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.items) && data.items.length > 0) {
+          setGalleryItems(data.items)
+        }
+      })
+      .catch(() => {
+        setGalleryItems(DEFAULT_GALLERY_ITEMS)
+      })
+  }, [])
 
   // Intersection observer for scroll animations
   useEffect(() => {

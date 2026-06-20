@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import Script from "next/script"
 import { Facebook, Twitter, Instagram } from "lucide-react"
+import { SITE_URL } from "@/lib/site-config"
 
 export default function SocialIntegration() {
   useEffect(() => {
@@ -10,14 +11,14 @@ export default function SocialIntegration() {
     const addOpenGraphTags = () => {
       const metaTags = [
         { property: "og:type", content: "website" },
-        { property: "og:url", content: "https://sharkysbar.com" },
+        { property: "og:url", content: SITE_URL },
         { property: "og:title", content: "Sharky's Bar | Marina de Albufeira | Sports, Food & Cocktails" },
         {
           property: "og:description",
           content:
             "A friendly bar with a warm atmosphere overlooking Marina de Albufeira. Enjoy live sports, freshly made food, and cocktails!",
         },
-        { property: "og:image", content: "https://sharkysbar.com/images/sharkys-og-image.jpg" },
+        { property: "og:image", content: `${SITE_URL}/images/sharkys-og-image.jpg` },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
         { property: "og:locale", content: "en_GB" },
@@ -31,7 +32,7 @@ export default function SocialIntegration() {
           content:
             "A friendly bar with a warm atmosphere overlooking Marina de Albufeira. Enjoy live sports, freshly made food, and cocktails!",
         },
-        { name: "twitter:image", content: "https://sharkysbar.com/images/sharkys-og-image.jpg" },
+        { name: "twitter:image", content: `${SITE_URL}/images/sharkys-og-image.jpg` },
       ]
 
       metaTags.forEach((tag) => {
@@ -51,7 +52,7 @@ export default function SocialIntegration() {
       {/* Social sharing buttons */}
       <div className="flex space-x-4 my-6">
         <a
-          href="https://www.facebook.com/sharer/sharer.php?u=https://sharkysbar.com"
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-[#1877F2] text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
@@ -61,7 +62,7 @@ export default function SocialIntegration() {
         </a>
 
         <a
-          href="https://twitter.com/intent/tweet?url=https://sharkysbar.com&text=Check out Sharky's Bar in Marina de Albufeira!"
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(SITE_URL)}&text=${encodeURIComponent("Check out Sharky's Bar in Marina de Albufeira!")}`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-[#1DA1F2] text-white p-2 rounded-full hover:bg-blue-400 transition-colors"
@@ -87,7 +88,7 @@ export default function SocialIntegration() {
         <div
           id="fb-comments"
           className="fb-comments"
-          data-href="https://sharkysbar.com"
+          data-href={SITE_URL}
           data-width="100%"
           data-numposts="5"
         ></div>

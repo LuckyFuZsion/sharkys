@@ -30,6 +30,7 @@ export default function Navbar() {
         "menu",
         "private-events",
         "sports",
+        "faq",
         "reviews",
         "contact",
       ]
@@ -140,6 +141,9 @@ export default function Navbar() {
           <NavLink href="#sports" active={activeSection === "sports"}>
             Sports
           </NavLink>
+          <NavLink href="#faq" active={activeSection === "faq"}>
+            FAQ
+          </NavLink>
           <NavLink href="#reviews" active={activeSection === "reviews"}>
             Reviews
           </NavLink>
@@ -183,6 +187,9 @@ export default function Navbar() {
           </MobileNavLink>
           <MobileNavLink href="#sports" onClick={handleLinkClick} active={activeSection === "sports"}>
             Sports
+          </MobileNavLink>
+          <MobileNavLink href="#faq" onClick={handleLinkClick} active={activeSection === "faq"}>
+            FAQ
           </MobileNavLink>
           <MobileNavLink href="#reviews" onClick={handleLinkClick} active={activeSection === "reviews"}>
             Reviews

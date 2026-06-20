@@ -2,7 +2,9 @@
 
 import { useRef, useEffect, useState } from "react"
 import Image from "next/image"
-import Script from "next/script"
+import type React from "react"
+import Link from "next/link"
+import { Facebook, Phone, Mail, MapPin, Clock } from "lucide-react"
 
 // Custom WhatsApp icon component
 const WhatsAppIcon = () => (
@@ -52,47 +54,6 @@ export default function Footer() {
 
   return (
     <footer id="contact" ref={footerRef} className="bg-blue-900 text-white relative overflow-hidden">
-      <Script id="local-business-schema" type="application/ld+json">
-        {`
-        {
-          "@context": "https://schema.org",
-          "@type": "BarOrPub",
-          "name": "Sharky's Bar",
-          "image": "https://sharkysbar.com/sharkys_logo.png",
-          "url": "https://sharkysbar.com",
-          "telephone": "+351914120017",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Marina de Albufeira, Lote 1, Loja 5",
-            "addressLocality": "Albufeira",
-            "addressRegion": "Faro",
-            "postalCode": "8200-394",
-            "addressCountry": "PT"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 37.0840,
-            "longitude": -8.2619
-          },
-          "openingHoursSpecification": {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday"
-            ],
-            "opens": "10:00",
-            "closes": "02:00"
-          }
-        }
-      `}
-      </Script>
-
-      {/* Decorative elements */}
       <div
         className="absolute top-0 right-0 w-64 h-64 bg-blue-800 rounded-full opacity-30 translate-x-1/3 -translate-y-1/2"
         aria-hidden="true"
@@ -111,8 +72,8 @@ export default function Footer() {
           >
             <h3 className="text-xl font-bold mb-4">Sharky&apos;s Bar</h3>
             <p className="mb-4">
-              A friendly bar with a warm atmosphere overlooking Marina de Albufeira. The perfect spot to relax, enjoy
-              great food, drinks, and watch live sports.
+              A friendly sports bar overlooking Marina de Albufeira. Breakfast, cocktails, live sports, and marina
+              views — the perfect spot to relax in the Algarve.
             </p>
             <div className="flex space-x-4">
               <SocialLink href="https://facebook.com" icon={<Facebook className="h-5 w-5" />} />
@@ -243,6 +204,12 @@ export default function Footer() {
                   Reviews
                 </Link>
               </li>
+              <li>
+                <Link href="#faq" className="hover:text-blue-300 transition-colors flex items-center group">
+                  <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -292,7 +259,3 @@ function SocialLink({ href, icon, ariaLabel }: { href: string; icon: React.React
     </a>
   )
 }
-
-import type React from "react"
-import Link from "next/link"
-import { Facebook, Phone, Mail, MapPin, Clock } from "lucide-react"

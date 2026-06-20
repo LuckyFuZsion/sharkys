@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { Star, Quote, ChevronRight } from "lucide-react"
 import Script from "next/script"
+import { SITE_URL } from "@/lib/site-config"
 
 type Testimonial = {
   id: string
@@ -107,7 +108,7 @@ export default function Testimonials() {
                     "itemReviewed": {
                       "@type": "Restaurant",
                       "name": "Sharky's Bar",
-                      "image": "https://sharkysbar.com/sharkys_logo.png",
+                      "image": "${SITE_URL}/sharkys_logo.png",
                       "address": {
                         "@type": "PostalAddress",
                         "streetAddress": "Marina de Albufeira, Lote 1, Loja 5",

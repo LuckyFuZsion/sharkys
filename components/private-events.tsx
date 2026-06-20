@@ -161,7 +161,7 @@ export default function PrivateEvents() {
                 <div className="space-y-4">
                   <div className="p-3 bg-white rounded-md shadow-sm hover:shadow-md transition-shadow">
                     <h5 className="font-medium text-blue-800">Option 1 - €12.50 per head</h5>
-                    <p className="text-gray-700">Food platters of burgers, pizzas, hot dogs, and chips</p>
+                    <p className="text-gray-700">Breakfast platters, sharing boards, pizzas, and bar favourites</p>
                   </div>
                   <div className="p-3 bg-white rounded-md shadow-sm hover:shadow-md transition-shadow">
                     <h5 className="font-medium text-blue-800">Option 2 - €7 per head</h5>

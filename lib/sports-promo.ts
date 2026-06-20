@@ -1,12 +1,18 @@
-import { del, list, put } from "@vercel/blob"
+import { del, put } from "@vercel/blob"
+import { readJsonFromBlob, writeJsonToBlob } from "@/lib/blob-config"
+import { BLOB_FOLDER } from "@/lib/blob-constants"
+import { getBlobReadWriteToken } from "@/lib/blob-token"
 import { DEFAULT_SPORTS_PROMO_URL } from "@/lib/sports-promo-constants"
 
 export { DEFAULT_SPORTS_PROMO_URL }
 
-/** Vercel Blob folder: store_GxciiOAbWRKAHdfe / Sharkys */
-const BLOB_FOLDER = "Sharkys"
 const CONFIG_BLOB_PATH = `${BLOB_FOLDER}/sports-promo-config.json`
 const PROMO_BLOB_PREFIX = `${BLOB_FOLDER}/sports-promo/`
+
+function blobOptions() {
+  const token = getBlobReadWriteToken()
+  return token ? { token } : undefined
+}
 
 type SportsPromoConfig = {
   url: string
@@ -17,18 +23,7 @@ function isVercelBlobUrl(url: string) {
 }
 
 async function readConfigFromBlob(): Promise<SportsPromoConfig | null> {
-  const { blobs } = await list({ prefix: CONFIG_BLOB_PATH, limit: 1 })
-
-  if (!blobs.length) {
-    return null
-  }
-
-  const response = await fetch(blobs[0].url, { cache: "no-store" })
-  if (!response.ok) {
-    return null
-  }
-
-  return response.json()
+  return readJsonFromBlob<SportsPromoConfig>(CONFIG_BLOB_PATH)
 }
 
 export async function getSportsPromoUrl() {
@@ -41,12 +36,7 @@ export async function getSportsPromoUrl() {
 }
 
 async function saveSportsPromoConfig(url: string) {
-  await put(CONFIG_BLOB_PATH, JSON.stringify({ url }), {
-    access: "public",
-    addRandomSuffix: false,
-    contentType: "application/json",
-    allowOverwrite: true,
-  })
+  await writeJsonToBlob<SportsPromoConfig>(CONFIG_BLOB_PATH, { url })
 }
 
 export async function uploadSportsPromoImage(file: File) {
@@ -58,13 +48,14 @@ export async function uploadSportsPromoImage(file: File) {
     access: "public",
     addRandomSuffix: false,
     contentType: file.type || "image/jpeg",
+    ...blobOptions(),
   })
 
   await saveSportsPromoConfig(blob.url)
 
   if (isVercelBlobUrl(currentUrl)) {
     try {
-      await del(currentUrl)
+      await del(currentUrl, blobOptions())
     } catch {
       // Old blob may already be removed; continue with the new upload.
     }

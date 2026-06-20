@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import GalleryManager from "@/components/admin/gallery-manager"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, LogOut, Upload } from "lucide-react"
+import { Home, Loader2, LogOut, Upload } from "lucide-react"
 
 export default function AdminPanel() {
   const [checkingSession, setCheckingSession] = useState(true)
@@ -179,9 +180,12 @@ export default function AdminPanel() {
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-blue-700 hover:underline">
-              Back to website
-            </Link>
+            <Button variant="outline" className="text-blue-900 border-blue-200 hover:bg-blue-50" asChild>
+              <Link href="/">
+                <Home className="h-4 w-4 mr-2" />
+                Return to main site
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -196,14 +200,22 @@ export default function AdminPanel() {
             <h1 className="text-xl font-bold">Sharky&apos;s Admin</h1>
             <p className="text-blue-100 text-sm">Content management</p>
           </div>
-          <Button variant="outline" className="text-blue-900 bg-white hover:bg-blue-50" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Log out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="text-blue-900 bg-white hover:bg-blue-50" asChild>
+              <Link href="/">
+                <Home className="h-4 w-4 mr-2" />
+                Return to main site
+              </Link>
+            </Button>
+            <Button variant="outline" className="text-blue-900 bg-white hover:bg-blue-50" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Log out
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
         <section className="bg-white rounded-xl shadow-lg p-6 md:p-8">
           <h2 className="text-2xl font-bold text-blue-900 mb-2">Add Sports Image</h2>
           <p className="text-gray-600 mb-6">
@@ -278,9 +290,14 @@ export default function AdminPanel() {
           </form>
         </section>
 
-        <div className="mt-6 text-center">
-          <Link href="/#sports" className="text-sm text-blue-700 hover:underline">
+        <GalleryManager />
+
+        <div className="mt-6 text-center space-y-2">
+          <Link href="/#sports" className="text-sm text-blue-700 hover:underline block">
             View sports section on homepage
+          </Link>
+          <Link href="/#gallery" className="text-sm text-blue-700 hover:underline block">
+            View gallery on homepage
           </Link>
         </div>
       </main>

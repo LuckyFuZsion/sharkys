@@ -6,6 +6,20 @@ import { Tv, Calendar, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SPORTS_PROMO_URL } from "@/lib/sports-promo-constants"
 
+function seededUnit(index: number, salt: number) {
+  const value = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453
+  return value - Math.floor(value)
+}
+
+const SPORTS_FLOATING_BUBBLES = Array.from({ length: 20 }, (_, index) => ({
+  width: seededUnit(index, 1) * 10 + 5,
+  height: seededUnit(index, 2) * 10 + 5,
+  top: seededUnit(index, 3) * 100,
+  left: seededUnit(index, 4) * 100,
+  duration: seededUnit(index, 5) * 10 + 10,
+  delay: seededUnit(index, 6) * 5,
+}))
+
 export default function Sports() {
   const [isVisible, setIsVisible] = useState(false)
   const [promoImageUrl, setPromoImageUrl] = useState(DEFAULT_SPORTS_PROMO_URL)
@@ -95,24 +109,20 @@ export default function Sports() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full">
-          {[...Array(20)].map((_, i) => {
-            const duration = Math.random() * 10 + 10
-            const delay = Math.random() * 5
-            return (
+          {SPORTS_FLOATING_BUBBLES.map((bubble, i) => (
               <div
                 key={i}
                 className="absolute rounded-full bg-white/5"
                 style={{
-                  width: `${Math.random() * 10 + 5}px`,
-                  height: `${Math.random() * 10 + 5}px`,
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  animation: `float ${duration}s infinite ease-in-out`,
-                  animationDelay: `${delay}s`,
+                  width: `${bubble.width}px`,
+                  height: `${bubble.height}px`,
+                  top: `${bubble.top}%`,
+                  left: `${bubble.left}%`,
+                  animation: `float ${bubble.duration}s infinite ease-in-out`,
+                  animationDelay: `${bubble.delay}s`,
                 }}
               ></div>
-            )
-          })}
+            ))}
         </div>
       </div>
 

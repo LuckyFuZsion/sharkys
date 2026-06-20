@@ -18,12 +18,19 @@ export default function About() {
 
   // Force reload with key change
   const [iframeKey, setIframeKey] = useState(0)
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null)
 
   // Reset error state if component remounts
   useEffect(() => {
     setVideoError(false)
     setVideoLoaded(false)
   }, [])
+
+  useEffect(() => {
+    setIframeSrc(
+      `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1&origin=${encodeURIComponent(window.location.origin)}`,
+    )
+  }, [iframeKey])
 
   // Intersection observer for scroll animations
   useEffect(() => {
@@ -94,16 +101,17 @@ export default function About() {
             }`}
           >
             <p className="text-lg mb-6 text-gray-700">
-              Sharky&apos;s Bar is a friendly and clean establishment located in the beautiful Marina de Albufeira. We
-              pride ourselves on creating a welcoming atmosphere for visitors of all ages.
+              Sharky&apos;s Bar is a friendly sports bar and café on the Marina de Albufeira waterfront. We serve
+              breakfast, drinks, and live sports in a welcoming setting for visitors and locals alike.
             </p>
             <p className="text-lg mb-6 text-gray-700">
               Our welcoming bar offers the perfect setting to relax and enjoy stunning views of the harbour from our
               spacious decking area. Inside, you&apos;ll find a cosy, inviting space perfect for any occasion.
             </p>
             <p className="text-lg mb-8 text-gray-700">
-              Whether you&apos;re joining us to watch live sports on our multiple screens, sample our freshly made food,
-              or sip on our expertly crafted cocktails, Sharky&apos;s promises a memorable experience for everyone.
+              Whether you&apos;re here for a full English breakfast, to watch live sports on our screens, or for
+              half-price cocktails during our Sunset Special, Sharky&apos;s is one of the best marina bars in
+              Albufeira.
             </p>
 
             <address className="space-y-4 relative not-italic">
@@ -207,20 +215,20 @@ export default function About() {
                   {/* Overlay to prevent YouTube controls from appearing on click */}
                   <div className="absolute inset-0 z-10" onClick={(e) => e.preventDefault()}></div>
 
-                  <iframe
-                    key={iframeKey}
-                    ref={iframeRef}
-                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1&origin=${encodeURIComponent(
-                      typeof window !== "undefined" ? window.location.origin : "",
-                    )}`}
-                    title="Sharky's Bar Tour - See our beautiful marina location and interior"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onLoad={handleVideoLoaded}
-                    onError={handleVideoError}
-                    loading="lazy"
-                    style={{ pointerEvents: "none" }}
-                  ></iframe>
+                  {iframeSrc && (
+                    <iframe
+                      key={iframeKey}
+                      ref={iframeRef}
+                      src={iframeSrc}
+                      title="Sharky's Bar Tour - See our beautiful marina location and interior"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onLoad={handleVideoLoaded}
+                      onError={handleVideoError}
+                      loading="lazy"
+                      style={{ pointerEvents: "none" }}
+                    ></iframe>
+                  )}
                 </div>
               )}
 
