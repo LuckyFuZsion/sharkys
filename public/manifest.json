@@ -1,0 +1,21 @@
+{
+  "name": "Sharky's Bar - Marina de Albufeira",
+  "short_name": "Sharky's Bar",
+  "description": "A friendly bar with a warm atmosphere overlooking Marina de Albufeira. Enjoy live sports, freshly made food, and cocktails!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "/sharkys_logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/sharkys_logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

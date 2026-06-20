@@ -1,0 +1,7 @@
+# Security Policy for Sharky's Bar Website
+Contact: mailto:security@sharkysbar.com
+Expires: 2025-12-31T23:59:59Z
+Preferred-Languages: en, pt
+Canonical: https://sharkysbar.com/.well-known/security.txt
+Policy: https://sharkysbar.com/security-policy
+Hiring: https://sharkysbar.com/jobs
