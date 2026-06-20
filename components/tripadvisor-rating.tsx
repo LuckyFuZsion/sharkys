@@ -1,25 +1,147 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import { Star, ExternalLink, Facebook } from "lucide-react"
-import { tripAdvisorMeta } from "@/lib/data"
+import { useEffect, useRef, useState } from "react"
+import { Star, ExternalLink, Facebook, Quote } from "lucide-react"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel"
+import {
+  FACEBOOK_REVIEWS_URL,
+  GOOGLE_REVIEWS_URL,
+  TRIPADVISOR_REVIEWS_URL,
+  featuredReviews,
+  getAuthorInitials,
+  getReviewSourceBadgeClass,
+  getReviewSourceLabel,
+  getReviewStarClass,
+  googleMeta,
+  truncateReviewText,
+  tripAdvisorMeta,
+} from "@/lib/featured-reviews"
+import type { ReviewType } from "@/lib/types"
+
+function StarRating({ rating, source }: { rating: number; source?: ReviewType["source"] }) {
+  const starClass = getReviewStarClass(source)
+
+  return (
+    <div className="flex" aria-label={`${rating} out of 5 stars`}>
+      {[...Array(5)].map((_, index) => (
+        <Star
+          key={index}
+          className={`h-4 w-4 ${index < rating ? starClass : "text-gray-300"}`}
+          aria-hidden="true"
+        />
+      ))}
+    </div>
+  )
+}
+
+function ReviewCard({ review }: { review: ReviewType }) {
+  const source = review.source ?? "tripadvisor"
+
+  return (
+    <article
+      id={`review-${review.id}`}
+      className="h-full rounded-2xl border border-blue-100 bg-white p-6 shadow-md flex flex-col"
+    >
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <Quote className="h-8 w-8 text-blue-200 shrink-0" aria-hidden="true" />
+        <StarRating rating={review.rating} source={source} />
+      </div>
+
+      <h3 className="text-lg font-semibold text-blue-900 mb-3 line-clamp-2">{review.title}</h3>
+      <p className="text-gray-700 leading-relaxed flex-1 line-clamp-5">
+        &ldquo;{truncateReviewText(review.content)}&rdquo;
+      </p>
+
+      <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="h-10 w-10 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-sm font-semibold shrink-0"
+            aria-hidden="true"
+          >
+            {getAuthorInitials(review.author)}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">{review.author}</p>
+            <p className="text-xs text-gray-500">{review.date}</p>
+          </div>
+        </div>
+        <span
+          className={`text-[10px] font-semibold uppercase tracking-wide shrink-0 ${getReviewSourceBadgeClass(source)}`}
+        >
+          {getReviewSourceLabel(source)}
+        </span>
+      </div>
+    </article>
+  )
+}
+
+function RatingSummary({
+  label,
+  rating,
+  reviewCount,
+  reviewLabel,
+  starClass,
+  labelClass,
+}: {
+  label: string
+  rating: number
+  reviewCount: number
+  reviewLabel: string
+  starClass: string
+  labelClass: string
+}) {
+  const fullStars = Math.floor(rating)
+  const hasHalfStar = rating % 1 >= 0.5
+
+  return (
+    <div className="rounded-2xl bg-white border border-blue-100 shadow-sm px-6 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className={`font-bold text-xl tracking-tight ${labelClass}`}>{label}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex">
+              {[...Array(5)].map((_, index) => (
+                <Star
+                  key={index}
+                  className={`h-5 w-5 ${
+                    index < fullStars
+                      ? starClass
+                      : index === fullStars && hasHalfStar
+                        ? `${starClass} opacity-50`
+                        : "text-gray-300"
+                  }`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+            <span className="text-2xl font-bold text-blue-900">{rating}</span>
+            <span className="text-gray-500">/ 5</span>
+          </div>
+        </div>
+        <p className="text-gray-700 text-sm sm:text-base">
+          Based on <span className="font-semibold">{reviewCount}</span> {reviewLabel}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default function TripAdvisorRating() {
   const [isVisible, setIsVisible] = useState(false)
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>()
+  const [currentSlide, setCurrentSlide] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
 
-  const tripAdvisorRating = tripAdvisorMeta.rating
-  const tripAdvisorReviewCount = tripAdvisorMeta.reviewCount
-
-  // Facebook data (new)
   const facebookRecommendPercent = 98
   const facebookReviewCount = 39
 
-  // Generate full and half stars based on rating
-  const fullStars = Math.floor(tripAdvisorRating)
-  const hasHalfStar = tripAdvisorRating % 1 >= 0.5
-
-  // Intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -28,9 +150,7 @@ export default function TripAdvisorRating() {
           observer.unobserve(entry.target)
         }
       },
-      {
-        threshold: 0.2,
-      },
+      { threshold: 0.15 },
     )
 
     if (sectionRef.current) {
@@ -44,110 +164,144 @@ export default function TripAdvisorRating() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!carouselApi) {
+      return
+    }
+
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap())
+    }
+
+    onSelect()
+    carouselApi.on("select", onSelect)
+
+    return () => {
+      carouselApi.off("select", onSelect)
+    }
+  }, [carouselApi])
+
   return (
     <section id="reviews" ref={sectionRef} className="py-16 bg-blue-50 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full opacity-30 translate-x-1/3 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50 rounded-full opacity-40 -translate-x-1/3 translate-y-1/3"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full opacity-30 translate-x-1/3 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50 rounded-full opacity-40 -translate-x-1/3 translate-y-1/3" />
 
       <div className="container mx-auto px-4 relative">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2
-            className={`text-3xl md:text-4xl font-bold mb-6 text-blue-900 transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
-            Customer Reviews
-          </h2>
-
-          {/* TripAdvisor Reviews */}
-          <div
-            className={`bg-white rounded-lg shadow-xl p-8 mb-8 transition-all duration-700 delay-200 transform ${
-              isVisible ? "opacity-100 translate-y-0 rotate-0" : "opacity-0 translate-y-10 rotate-1"
-            } hover:shadow-2xl hover:-translate-y-1`}
-          >
-            <div className="flex items-center justify-center mb-2">
-              <img src="/tripadvisor-logo-display.png" alt="TripAdvisor" className="h-8 mr-2" />
-              <h3 className="text-xl font-bold text-blue-900">TripAdvisor Reviews</h3>
-            </div>
-
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex mr-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-8 w-8 ${
-                      i < fullStars
-                        ? "text-yellow-400 fill-yellow-400"
-                        : i === fullStars && hasHalfStar
-                          ? "text-yellow-400 fill-gradient-to-r from-yellow-400 to-gray-300"
-                          : "text-gray-300"
-                    }`}
-                    style={i < fullStars ? { animation: `pulse 3s infinite`, animationDelay: `${i * 0.2}s` } : {}}
-                  />
-                ))}
-              </div>
-              <span className="text-3xl font-bold text-blue-900">{tripAdvisorRating}</span>
-              <span className="text-gray-500 ml-2">/ 5</span>
-            </div>
-
-            <p className="text-lg text-gray-700 mb-6">
-              Based on <span className="font-semibold">{tripAdvisorReviewCount}</span> reviews on TripAdvisor
-            </p>
-
-            <a
-              href="https://www.tripadvisor.co.uk/Attraction_Review-g189112-d10049522-Reviews-Sharky_s_Bar-Albufeira_Faro_District_Algarve.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all transform hover:scale-105 hover:shadow-lg"
-            >
-              <span className="mr-2">Read Reviews on TripAdvisor</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </div>
-
-          {/* Facebook Reviews */}
-          <div
-            className={`bg-white rounded-lg shadow-xl p-8 mb-8 transition-all duration-700 delay-400 transform ${
-              isVisible ? "opacity-100 translate-y-0 rotate-0" : "opacity-0 translate-y-10 rotate-1"
-            } hover:shadow-2xl hover:-translate-y-1`}
-          >
-            <div className="flex items-center justify-center mb-2">
-              <Facebook className="h-8 w-8 text-blue-600 mr-2" />
-              <h3 className="text-xl font-bold text-blue-900">Facebook Reviews</h3>
-            </div>
-
-            <div className="flex items-center justify-center mb-4">
-              <div className="bg-blue-600 text-white text-2xl font-bold rounded-full w-16 h-16 flex items-center justify-center transform hover:scale-110 transition-transform shadow-lg">
-                {facebookRecommendPercent}%
-              </div>
-            </div>
-
-            <p className="text-lg text-gray-700 mb-6">
-              <span className="font-semibold">{facebookRecommendPercent}%</span> of people recommend Sharky's Bar
-              <br />
-              Based on <span className="font-semibold">{facebookReviewCount}</span> reviews
-            </p>
-
-            <a
-              href="https://www.facebook.com/share/18zhz9ogBu/?mibextid=wwXIfr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 bg-[#1877F2] text-white rounded-md hover:bg-[#0e6edf] transition-all transform hover:scale-105 hover:shadow-lg"
-            >
-              <span className="mr-2">Read Reviews on Facebook</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </div>
-
-          <p
-            className={`text-gray-600 transition-all duration-700 delay-600 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
-            We appreciate all feedback from our customers. If you&apos;ve visited us recently, please consider leaving a
-            review on TripAdvisor or Facebook.
+        <div
+          className={`text-center mb-10 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">Customer Reviews</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Real feedback from TripAdvisor and Google guests who have visited Sharky&apos;s Bar at Marina de
+            Albufeira.
           </p>
+        </div>
+
+        <div
+          className={`max-w-6xl mx-auto mb-10 transition-all duration-700 delay-150 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <RatingSummary
+              label="TripAdvisor"
+              rating={tripAdvisorMeta.rating}
+              reviewCount={tripAdvisorMeta.reviewCount}
+              reviewLabel="TripAdvisor reviews"
+              starClass="text-[#00AA6C] fill-[#00AA6C]"
+              labelClass="text-[#00AA6C]"
+            />
+            <RatingSummary
+              label="Google"
+              rating={googleMeta.rating}
+              reviewCount={googleMeta.reviewCount}
+              reviewLabel="Google reviews"
+              starClass="text-yellow-500 fill-yellow-500"
+              labelClass="text-[#4285F4]"
+            />
+          </div>
+
+          <div className="relative px-2 sm:px-12">
+            <Carousel setApi={setCarouselApi} opts={{ align: "start", loop: true }} className="w-full">
+              <CarouselContent className="-ml-4">
+                {featuredReviews.map((review) => (
+                  <CarouselItem key={review.id} className="pl-4 basis-full md:basis-1/2 xl:basis-1/3">
+                    <ReviewCard review={review} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-0 sm:-left-2 bg-white shadow-md border-blue-100 hover:bg-blue-50" />
+              <CarouselNext className="right-0 sm:-right-2 bg-white shadow-md border-blue-100 hover:bg-blue-50" />
+            </Carousel>
+
+            <div className="flex justify-center gap-2 mt-6 flex-wrap">
+              {featuredReviews.map((review, index) => (
+                <button
+                  key={review.id}
+                  type="button"
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    currentSlide === index ? "w-8 bg-blue-600" : "w-2 bg-blue-300 hover:bg-blue-400"
+                  }`}
+                  aria-label={`Go to review ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+            <a
+              href={TRIPADVISOR_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-[#00AA6C] text-white rounded-md hover:bg-[#00945d] transition-all transform hover:scale-105 hover:shadow-lg"
+            >
+              <span className="mr-2">TripAdvisor reviews</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-[#4285F4] text-white rounded-md hover:bg-[#3367d6] transition-all transform hover:scale-105 hover:shadow-lg"
+            >
+              <span className="mr-2">Google reviews</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+
+        <div
+          className={`max-w-3xl mx-auto grid md:grid-cols-2 gap-6 transition-all duration-700 delay-300 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-6 text-center">
+            <div className="flex items-center justify-center mb-3">
+              <Facebook className="h-7 w-7 text-[#1877F2] mr-2" aria-hidden="true" />
+              <h3 className="text-lg font-bold text-blue-900">Facebook</h3>
+            </div>
+            <p className="text-3xl font-bold text-[#1877F2] mb-2">{facebookRecommendPercent}% recommend</p>
+            <p className="text-gray-600 mb-4">Based on {facebookReviewCount} reviews</p>
+            <a
+              href={FACEBOOK_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-sm font-medium text-[#1877F2] hover:underline"
+            >
+              View on Facebook
+              <ExternalLink className="h-4 w-4 ml-1" />
+            </a>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-6 flex items-center">
+            <p className="text-gray-700 text-center w-full">
+              Visited us recently? Leave a review on TripAdvisor, Google, or Facebook — we appreciate every bit of
+              feedback.
+            </p>
+          </div>
         </div>
       </div>
     </section>

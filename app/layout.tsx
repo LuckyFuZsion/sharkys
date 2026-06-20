@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/images/sharkys-og-image.jpg",
-        width: 1200,
-        height: 630,
+        url: "/sharkys_logo.png",
+        width: 512,
+        height: 512,
         alt: "Sharky's Bar at Marina de Albufeira",
       },
     ],
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: "Sharky's Bar | Marina de Albufeira",
     description:
       "Waterfront sports bar at Marina de Albufeira serving breakfast, cocktails, and live sports.",
-    images: ["/images/sharkys-og-image.jpg"],
+    images: ["/sharkys_logo.png"],
     creator: "@sharkysbar",
     site: "@sharkysbar",
   },
@@ -57,9 +57,13 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/sharkys_logo.png" }],
-    apple: { url: "/sharkys_logo.png" },
-    shortcut: [{ url: "/sharkys_logo.png" }],
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    shortcut: ["/favicon.ico"],
   },
   category: "Food & Drink",
   verification: {

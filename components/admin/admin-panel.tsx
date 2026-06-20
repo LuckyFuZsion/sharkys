@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Home, Loader2, LogOut, Upload } from "lucide-react"
+import { bypassImageOptimization } from "@/lib/image-utils"
 
 export default function AdminPanel() {
   const [checkingSession, setCheckingSession] = useState(true)
@@ -233,7 +234,7 @@ export default function AdminPanel() {
                   width={600}
                   height={600}
                   className="w-full object-cover"
-                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 600px"
                 />
               </div>
             </div>
@@ -261,7 +262,7 @@ export default function AdminPanel() {
                     width={600}
                     height={600}
                     className="w-full object-cover"
-                    unoptimized
+                    unoptimized={bypassImageOptimization(previewUrl)}
                   />
                 </div>
               </div>

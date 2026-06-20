@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from "react"
 import { MapPin, Clock, Phone, RefreshCw } from "lucide-react"
 import Image from "next/image"
+import { ABOUT_VIDEO_POSTER, ABOUT_VIDEO_URL } from "@/lib/about-video"
+
+const LOAD_TIMEOUT_MS = 15000
 
 export default function About() {
   const [videoError, setVideoError] = useState(false)
@@ -10,29 +13,8 @@ export default function About() {
   const [isVisible, setIsVisible] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
-  // YouTube video ID - extracted from the shorts URL
-  const videoId = "uHK2BiBjNKA"
-
-  // Force reload with key change
-  const [iframeKey, setIframeKey] = useState(0)
-  const [iframeSrc, setIframeSrc] = useState<string | null>(null)
-
-  // Reset error state if component remounts
-  useEffect(() => {
-    setVideoError(false)
-    setVideoLoaded(false)
-  }, [])
-
-  useEffect(() => {
-    setIframeSrc(
-      `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1&origin=${encodeURIComponent(window.location.origin)}`,
-    )
-  }, [iframeKey])
-
-  // Intersection observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -57,25 +39,48 @@ export default function About() {
     }
   }, [])
 
-  const handleVideoError = () => {
-    console.error("Video failed to load")
-    setVideoError(true)
+  useEffect(() => {
+    if (videoLoaded || videoError) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      setVideoError(true)
+    }, LOAD_TIMEOUT_MS)
+
+    return () => window.clearTimeout(timeout)
+  }, [videoLoaded, videoError])
+
+  const handleVideoLoaded = async () => {
+    setVideoLoaded(true)
+
+    try {
+      await videoRef.current?.play()
+    } catch {
+      // Autoplay can still be blocked on some mobile browsers even when muted.
+      setVideoLoaded(true)
+    }
   }
 
-  const handleVideoLoaded = () => {
-    setVideoLoaded(true)
+  const handleVideoError = () => {
+    setVideoError(true)
   }
 
   const reloadVideo = () => {
     setVideoLoaded(false)
     setVideoError(false)
-    // Force iframe reload by changing its key
-    setIframeKey((prev) => prev + 1)
+
+    const video = videoRef.current
+    if (!video) return
+
+    video.load()
+    void video.play().catch(() => {
+      // Ignore autoplay rejection; controls remain available via reload hover state.
+    })
   }
 
   return (
     <section id="about" ref={sectionRef} className="py-12 bg-white relative overflow-hidden">
-      {/* Decorative elements */}
       <div
         className="absolute top-0 left-0 w-64 h-64 bg-blue-100 rounded-full opacity-30 -translate-x-1/2 -translate-y-1/2"
         aria-hidden="true"
@@ -141,20 +146,17 @@ export default function About() {
               isVisible ? "opacity-100 translate-x-0 rotate-0" : "opacity-0 translate-x-10 rotate-2"
             }`}
           >
-            {/* Video container with 3D effect */}
             <div
               className="absolute inset-0 transform hover:scale-105 transition-transform duration-700 ease-in-out"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              {/* Show loading state until video loads or errors */}
               {!videoLoaded && !videoError && (
                 <div
                   className="absolute inset-0 bg-gradient-to-b from-blue-50 to-blue-100 flex flex-col items-center justify-center overflow-hidden"
                   aria-label="Loading video"
                   role="status"
                 >
-                  {/* Wave animation */}
                   <div className="absolute bottom-0 left-0 right-0 h-24 overflow-hidden">
                     <div
                       className="absolute bottom-[-10px] left-0 right-0 h-24 w-[200%] animate-wave"
@@ -167,7 +169,6 @@ export default function About() {
                     ></div>
                   </div>
 
-                  {/* Shark fin loader */}
                   <div className="relative mb-12">
                     <div className="w-16 h-16 relative">
                       <div className="absolute w-10 h-10 bg-blue-600 rounded-full left-3 top-3 animate-pulse"></div>
@@ -179,16 +180,15 @@ export default function About() {
                         />
                       </svg>
                     </div>
-                    <p className="text-blue-800 font-medium mt-4 animate-pulse">Loading Sharky's Bar video...</p>
+                    <p className="text-blue-800 font-medium mt-4 animate-pulse">Loading Sharky&apos;s Bar video...</p>
                   </div>
                 </div>
               )}
 
-              {/* Fallback image in case video fails */}
               {videoError && (
                 <div className="relative w-full h-full">
                   <Image
-                    src="/interior.jpg"
+                    src={ABOUT_VIDEO_POSTER}
                     alt="Interior of Sharky's Bar showing the cozy seating area and bar"
                     fill
                     className="object-cover"
@@ -204,35 +204,29 @@ export default function About() {
                 </div>
               )}
 
-              {/* YouTube embed with enhanced no-controls approach and zoomed in */}
               {!videoError && (
                 <div
-                  ref={containerRef}
-                  className={`absolute inset-0 w-full h-full ${
+                  className={`absolute inset-0 w-full h-full about-video-container ${
                     videoLoaded ? "opacity-100" : "opacity-0"
-                  } transition-opacity duration-500 youtube-container`}
+                  } transition-opacity duration-500`}
                 >
-                  {/* Overlay to prevent YouTube controls from appearing on click */}
-                  <div className="absolute inset-0 z-10" onClick={(e) => e.preventDefault()}></div>
-
-                  {iframeSrc && (
-                    <iframe
-                      key={iframeKey}
-                      ref={iframeRef}
-                      src={iframeSrc}
-                      title="Sharky's Bar Tour - See our beautiful marina location and interior"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onLoad={handleVideoLoaded}
-                      onError={handleVideoError}
-                      loading="lazy"
-                      style={{ pointerEvents: "none" }}
-                    ></iframe>
-                  )}
+                  <video
+                    ref={videoRef}
+                    src={ABOUT_VIDEO_URL}
+                    poster={ABOUT_VIDEO_POSTER}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    onLoadedData={handleVideoLoaded}
+                    onCanPlay={handleVideoLoaded}
+                    onError={handleVideoError}
+                  />
                 </div>
               )}
 
-              {/* Reload button */}
               {(isHovering || videoError) && (
                 <button
                   onClick={reloadVideo}
@@ -245,13 +239,11 @@ export default function About() {
               )}
             </div>
 
-            {/* Decorative frame */}
             <div
               className="absolute inset-0 border-4 border-white/20 rounded-lg pointer-events-none"
               aria-hidden="true"
             ></div>
 
-            {/* Corner accents */}
             <div
               className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-400 rounded-tl-lg"
               aria-hidden="true"
@@ -273,18 +265,4 @@ export default function About() {
       </div>
     </section>
   )
-}
-
-// Add animation styles for wave and rock animations
-declare global {
-  interface CSSStyleDeclaration {
-    animationName: string
-    animationDuration: string
-    animationTimingFunction: string
-    animationDelay: string
-    animationIterationCount: string
-    animationDirection: string
-    animationFillMode: string
-    animationPlayState: string
-  }
 }

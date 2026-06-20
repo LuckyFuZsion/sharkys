@@ -12,7 +12,7 @@ export const siteFaqs: FAQItem[] = [
   {
     question: "Does Sharky's Bar show live sports?",
     answer:
-      "Yes. We show major sporting events on multiple screens throughout the bar, including football, rugby, Formula 1, and UFC. Check our sports section or social media for upcoming fixtures.",
+      "Yes. We show major sporting events on multiple screens throughout the bar, including football, rugby, Formula 1, and UFC. See our live sports page for more details.",
   },
   {
     question: "Can I book Sharky's Bar for private events?",
@@ -22,12 +22,12 @@ export const siteFaqs: FAQItem[] = [
   {
     question: "Does Sharky's Bar serve food?",
     answer:
-      "Yes. We serve a full breakfast menu daily, including full English breakfasts, breakfast burritos, toasties, and the Full Monty special. See our menu section for current dishes and prices.",
+      "Yes. We serve a full breakfast menu daily, including full English breakfasts, breakfast burritos, toasties, and the Full Monty special. See our menu page for current dishes and prices.",
   },
   {
     question: "Where is Sharky's Bar located?",
     answer:
-      "Sharky's Bar is at Marina de Albufeira, Lote 1, Loja 5, Albufeira, Portugal, overlooking the marina. We are a short walk from the main marina area.",
+      "Sharky's Bar is at Marina de Albufeira, Lote 1, Loja 5, Albufeira, Portugal, overlooking the marina. Visit our location page for directions, parking, and a map.",
   },
   {
     question: "Is there a dress code at Sharky's Bar?",

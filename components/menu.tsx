@@ -324,7 +324,13 @@ export default function Menu() {
           isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
       >
-        <Image src="/images/food7.jpg" alt="Breakfast at Sharky's Bar" fill className="object-cover" />
+        <Image
+          src="/images/food7.jpg"
+          alt="Breakfast at Sharky's Bar"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 768px"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-4 text-white">
             <h4 className="font-bold text-lg">Freshly Prepared</h4>
@@ -378,7 +384,13 @@ export default function Menu() {
           isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
       >
-        <Image src="/images/food10.jpg" alt="Our signature cocktails" fill className="object-cover" />
+        <Image
+          src="/images/food10.jpg"
+          alt="Our signature cocktails"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 768px"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-4 text-white">
             <h4 className="font-bold text-lg">Expertly Crafted</h4>

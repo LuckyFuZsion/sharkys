@@ -173,7 +173,13 @@ export default function Gallery() {
                     opacity: isVisible ? 1 : 0,
                   }}
                 >
-                  <Image src={item.thumbnail || "/placeholder.svg"} alt={item.alt} fill className="object-cover" />
+                  <Image
+                    src={item.thumbnail || "/placeholder.svg"}
+                    alt={item.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                  />
                   {item.type === "video" && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
@@ -226,6 +232,7 @@ export default function Gallery() {
                 alt={galleryItems[selectedItem].alt}
                 fill
                 className="object-contain"
+                sizes="100vw"
               />
             ) : selectedItem !== null && galleryItems[selectedItem].type === "video" ? (
               <video src={galleryItems[selectedItem].src} controls className="w-full h-full object-contain" />

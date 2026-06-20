@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
@@ -59,15 +60,15 @@ export default function Hero() {
           cocktails with stunning marina views.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
-          <a href="#menu" aria-label="View our food and drinks menu">
+          <Link href="/menu" aria-label="View our food and drinks menu">
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/50"
             >
               View Our Menu
             </Button>
-          </a>
-          <a href="#contact" aria-label="Find our location and contact information">
+          </Link>
+          <Link href="/location" aria-label="Find our location and contact information">
             <Button
               size="lg"
               variant="outline"
@@ -75,7 +76,7 @@ export default function Hero() {
             >
               Find Us
             </Button>
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const VALID_PAGE_PATHS = new Set(["/", "/admin"])
+const VALID_PAGE_PATHS = new Set(["/", "/admin", "/menu", "/location", "/private-events", "/sports", "/privacy"])
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

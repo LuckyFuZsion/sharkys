@@ -163,51 +163,63 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#about" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/#about" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#gallery" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/#gallery" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Gallery
                 </Link>
               </li>
               <li>
-                <Link href="#promotions" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/#promotions" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Promotions
                 </Link>
               </li>
               <li>
-                <Link href="#menu" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/menu" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Menu
                 </Link>
               </li>
               <li>
-                <Link href="#private-events" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/location" className="hover:text-blue-300 transition-colors flex items-center group">
+                  <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
+                  Location
+                </Link>
+              </li>
+              <li>
+                <Link href="/private-events" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Private Events
                 </Link>
               </li>
               <li>
-                <Link href="#sports" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/sports" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Live Sports
                 </Link>
               </li>
               <li>
-                <Link href="#reviews" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/#reviews" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   Reviews
                 </Link>
               </li>
               <li>
-                <Link href="#faq" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link href="/#faq" className="hover:text-blue-300 transition-colors flex items-center group">
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
                   FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-blue-300 transition-colors flex items-center group">
+                  <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
+                  Privacy Policy
                 </Link>
               </li>
             </ul>
@@ -220,7 +232,12 @@ export default function Footer() {
           }`}
         >
           <div className="flex flex-col items-center">
-            <p className="mb-4">&copy; {new Date().getFullYear()} Sharky&apos;s Bar. All rights reserved.</p>
+            <p className="mb-4">
+              &copy; {new Date().getFullYear()} Sharky&apos;s Bar. All rights reserved.{" "}
+              <Link href="/privacy" className="hover:text-white underline underline-offset-2">
+                Privacy Policy
+              </Link>
+            </p>
 
             {/* WebFuzsion Logo */}
             <a

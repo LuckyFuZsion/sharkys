@@ -85,6 +85,7 @@ export default function Sports() {
           width={600}
           height={600}
           className="w-full object-cover"
+          sizes="(max-width: 768px) 100vw, 600px"
           priority
         />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/40 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -206,6 +207,7 @@ export default function Sports() {
                 alt="Crowd watching live sports at Sharky's Bar"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
 
               {/* Overlay with TV screen effect */}
