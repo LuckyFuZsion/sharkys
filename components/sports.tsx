@@ -4,9 +4,11 @@ import { useRef, useEffect, useState } from "react"
 import Image from "next/image"
 import { Tv, Calendar, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DEFAULT_SPORTS_PROMO_URL } from "@/lib/sports-promo-constants"
 
 export default function Sports() {
   const [isVisible, setIsVisible] = useState(false)
+  const [promoImageUrl, setPromoImageUrl] = useState(DEFAULT_SPORTS_PROMO_URL)
   const sectionRef = useRef<HTMLElement>(null)
 
   // Intersection observer for scroll animations
@@ -34,6 +36,19 @@ export default function Sports() {
     }
   }, [])
 
+  useEffect(() => {
+    fetch("/api/sports-promo")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.url) {
+          setPromoImageUrl(data.url)
+        }
+      })
+      .catch(() => {
+        setPromoImageUrl(DEFAULT_SPORTS_PROMO_URL)
+      })
+  }, [])
+
   // This would typically come from your CMS or database
   const upcomingEvents = [
     { id: 1, title: "Monaco F1 Grand Prix", date: "Sunday", time: "15:00", featured: true },
@@ -51,7 +66,7 @@ export default function Sports() {
     <div className="mb-8 transform hover:scale-[1.02] transition-transform duration-500">
       <div className="relative rounded-lg overflow-hidden shadow-xl">
         <Image
-          src="https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/9e412a3f-eb9d-4c9a-b778-bf3dd3644316%20%281%29-O4lkgpgXrNWK5MyfjCKgrTRR1uAbb9.jpg"
+          src={promoImageUrl}
           alt="This Sunday at Sharky's Bar - Monaco F1 Grand Prix and Premier League matches"
           width={600}
           height={600}
