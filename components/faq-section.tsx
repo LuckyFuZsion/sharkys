@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect } from "react"
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
-import { siteFaqs } from "@/lib/faq-content"
+import { useLocaleContext } from "@/components/locale-provider"
 
 export default function FAQSection() {
+  const { dictionary } = useLocaleContext()
+  const faq = dictionary.faq
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
@@ -45,14 +47,14 @@ export default function FAQSection() {
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-center mb-8">
           <HelpCircle className="h-8 w-8 mr-3 text-blue-600" aria-hidden="true" />
-          <h2 className="text-3xl md:text-4xl font-bold text-blue-900">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900">{faq.title}</h2>
         </div>
 
         <div className="max-w-3xl mx-auto">
           <div className="space-y-4">
-            {siteFaqs.map((faq, index) => (
+            {faq.items.map((item, index) => (
               <div
-                key={faq.question}
+                key={item.question}
                 className={`border border-gray-200 rounded-lg overflow-hidden transition-all duration-500 transform ${
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                 } ${openIndex === index ? "shadow-md" : "shadow-sm hover:shadow-md"}`}
@@ -64,7 +66,7 @@ export default function FAQSection() {
                   aria-expanded={openIndex === index}
                   aria-controls={`faq-answer-${index}`}
                 >
-                  <h3 className="text-lg font-medium text-blue-900 faq-question">{faq.question}</h3>
+                  <h3 className="text-lg font-medium text-blue-900 faq-question">{item.question}</h3>
                   {openIndex === index ? (
                     <ChevronUp className="h-5 w-5 text-blue-600 flex-shrink-0" />
                   ) : (
@@ -78,7 +80,7 @@ export default function FAQSection() {
                   }`}
                 >
                   <div className="p-4 bg-blue-50/30 faq-answer">
-                    <p className="text-gray-700">{faq.answer}</p>
+                    <p className="text-gray-700">{item.answer}</p>
                   </div>
                 </div>
               </div>
@@ -86,13 +88,7 @@ export default function FAQSection() {
           </div>
 
           <div className="mt-12 text-center">
-            <p className="text-gray-600">
-              Don&apos;t see your question here? Feel free to{" "}
-              <a href="#contact" className="text-blue-600 hover:text-blue-800 underline">
-                contact us
-              </a>{" "}
-              directly and we&apos;ll be happy to help!
-            </p>
+            <p className="text-gray-600">{faq.footerText}</p>
           </div>
         </div>
       </div>

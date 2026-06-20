@@ -1,6 +1,8 @@
 import { SITE_URL } from "@/lib/site-config"
-import { siteFaqs } from "@/lib/faq-content"
 import { businessInfo, schemaBusinessAddress } from "@/lib/business-info"
+import { schemaInLanguage } from "@/lib/i18n/metadata"
+import { localizePath } from "@/lib/i18n/navigation"
+import type { Dictionary, Locale } from "@/lib/i18n/types"
 import {
   getBarOrPubReviewReferences,
   getGoogleAggregateRatingSchema,
@@ -9,29 +11,33 @@ import {
   getTripAdvisorAggregateRatingSchema,
 } from "@/lib/review-schema"
 
-export function getStructuredDataGraph() {
+export function getStructuredDataGraph(dictionary: Dictionary, locale: Locale) {
   const reviewNodes = getReviewSchemaNodes()
   const reviewList = getReviewItemListSchema()
   const tripAdvisorAggregateRating = getTripAdvisorAggregateRatingSchema()
   const googleAggregateRating = getGoogleAggregateRatingSchema()
 
+  const homePath = localizePath("/", locale)
+  const menuPath = localizePath("/menu", locale)
+  const homeUrl = `${SITE_URL}${homePath}`
+  const menuUrl = `${SITE_URL}${menuPath}`
+
   const barOrPub = {
     "@type": "BarOrPub",
     "@id": `${SITE_URL}/#bar`,
     name: businessInfo.name,
-    description:
-      "Sports bar and waterfront café at Marina de Albufeira serving breakfast, cocktails, and live sports with marina views.",
+    description: dictionary.hero.tagline,
     image: `${SITE_URL}/sharkys_logo.png`,
-    url: SITE_URL,
+    url: homeUrl,
     telephone: businessInfo.telephone,
     email: businessInfo.email,
     priceRange: "€€",
     servesCuisine: ["Breakfast", "Bar Food", "International", "British"],
-    menu: `${SITE_URL}/menu`,
+    menu: menuUrl,
     hasMenu: {
       "@type": "Menu",
-      name: "Sharky's Bar Menu",
-      url: `${SITE_URL}/menu`,
+      name: dictionary.menu.ourMenu,
+      url: menuUrl,
     },
     acceptsReservations: true,
     address: schemaBusinessAddress,
@@ -57,18 +63,19 @@ export function getStructuredDataGraph() {
       "https://www.google.com/maps/search/?api=1&query=Sharky's+Bar,+Marina+de+Albufeira,+Albufeira,+Portugal",
     ],
     amenityFeature: [
-      { "@type": "LocationFeatureSpecification", name: "Live Sports", value: true },
-      { "@type": "LocationFeatureSpecification", name: "Outdoor Seating", value: true },
-      { "@type": "LocationFeatureSpecification", name: "Marina View", value: true },
-      { "@type": "LocationFeatureSpecification", name: "Breakfast", value: true },
+      { "@type": "LocationFeatureSpecification", name: dictionary.schema.amenities.liveSports, value: true },
+      { "@type": "LocationFeatureSpecification", name: dictionary.schema.amenities.outdoorSeating, value: true },
+      { "@type": "LocationFeatureSpecification", name: dictionary.schema.amenities.marinaView, value: true },
+      { "@type": "LocationFeatureSpecification", name: dictionary.schema.amenities.breakfast, value: true },
     ],
   }
 
   const reviewsWebPage = {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#reviews`,
-    url: `${SITE_URL}/#reviews`,
-    name: "Customer Reviews",
+    url: `${homeUrl}#reviews`,
+    name: dictionary.reviews.title,
+    inLanguage: schemaInLanguage(locale),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#bar` },
     mainEntity: { "@id": `${SITE_URL}/#review-list` },
@@ -78,7 +85,7 @@ export function getStructuredDataGraph() {
   const faqPage = {
     "@type": "FAQPage",
     "@id": `${SITE_URL}/#faq`,
-    mainEntity: siteFaqs.map((faq) => ({
+    mainEntity: dictionary.faq.items.map((faq) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
@@ -91,9 +98,9 @@ export function getStructuredDataGraph() {
   const sunsetOffer = {
     "@type": "Offer",
     "@id": `${SITE_URL}/#sunset-special`,
-    name: "Sunset Special — Half Price Cocktails",
-    description: "Half-price cocktails daily from 6 PM to 8 PM at Sharky's Bar.",
-    url: `${SITE_URL}/#promotions`,
+    name: dictionary.menu.sunsetSpecial,
+    description: dictionary.menu.sunsetDesc,
+    url: `${homeUrl}#promotions`,
     priceCurrency: "EUR",
     price: "4.50",
     eligibleRegion: {
@@ -107,9 +114,10 @@ export function getStructuredDataGraph() {
   const webPage = {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
-    url: SITE_URL,
-    name: "Sharky's Bar | Marina de Albufeira | Sports, Food & Cocktails",
-    isPartOf: { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: "Sharky's Bar" },
+    url: homeUrl,
+    name: dictionary.meta.home.title,
+    inLanguage: schemaInLanguage(locale),
+    isPartOf: { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: dictionary.common.siteName },
     about: { "@id": `${SITE_URL}/#bar` },
     hasPart: [{ "@id": `${SITE_URL}/#reviews` }, { "@id": `${SITE_URL}/#review-list` }],
     speakable: {

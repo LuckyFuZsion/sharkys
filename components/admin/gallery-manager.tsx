@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { GalleryItem } from "@/lib/gallery-types"
-import { ArrowDownToLine, ArrowUpToLine, GripVertical, Loader2, Trash2, Upload, X } from "lucide-react"
+import { ArrowDownToLine, ArrowUpToLine, ChevronDown, ChevronUp, GripVertical, Loader2, Trash2, Upload, X } from "lucide-react"
 import { bypassImageOptimization } from "@/lib/image-utils"
 
 type SelectedPreview = {
@@ -136,6 +136,14 @@ export default function GalleryManager() {
 
   const moveItemToEnd = (index: number) => {
     reorderItems(index, items.length - 1)
+  }
+
+  const moveItemUp = (index: number) => {
+    reorderItems(index, index - 1)
+  }
+
+  const moveItemDown = (index: number) => {
+    reorderItems(index, index + 1)
   }
 
   const handleDragStart = (index: number) => (event: React.DragEvent) => {
@@ -311,11 +319,11 @@ export default function GalleryManager() {
   }
 
   return (
-    <section className="bg-white rounded-xl shadow-lg p-6 md:p-8 mt-8">
-      <h2 className="text-2xl font-bold text-blue-900 mb-2">Manage Gallery</h2>
-      <p className="text-gray-600 mb-6">
-        Add images in bulk, delete images, and drag to reorder the homepage gallery. You can also jump an image to a
-        specific position number.
+    <section className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 mt-6 sm:mt-8">
+      <h2 className="text-xl sm:text-2xl font-bold text-blue-900 mb-2">Manage Gallery</h2>
+      <p className="text-gray-600 mb-6 text-sm sm:text-base">
+        Add images in bulk, delete images, and reorder the homepage gallery. On mobile, use the arrow buttons to move
+        items. On desktop, you can also drag and drop or jump to a specific position.
       </p>
 
       <form onSubmit={handleUpload} className="space-y-4 mb-8 pb-8 border-b border-gray-200">
@@ -389,7 +397,7 @@ export default function GalleryManager() {
 
         <Button
           type="submit"
-          className="bg-blue-900 hover:bg-blue-800"
+          className="w-full sm:w-auto min-h-11 bg-blue-900 hover:bg-blue-800"
           disabled={uploading || selectedFiles.length === 0}
         >
           {uploading ? (
@@ -413,7 +421,8 @@ export default function GalleryManager() {
         <div className="mb-8 pb-8 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">Gallery preview</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Drag and drop images to reorder. This matches the order shown on the homepage gallery.
+            <span className="hidden md:inline">Drag and drop images to reorder. </span>
+            This matches the order shown on the homepage gallery.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {items.map((item, index) => (
@@ -485,20 +494,20 @@ export default function GalleryManager() {
               onDragOver={handleDragOver(index)}
               onDrop={handleDrop(index)}
               onDragEnd={handleDragEnd}
-              className={`flex flex-col sm:flex-row gap-4 items-start sm:items-center border rounded-lg p-4 transition-colors ${
+              className={`border rounded-lg p-3 sm:p-4 transition-colors ${
                 dragOverIndex === index ? "border-blue-400 bg-blue-50" : "border-gray-200"
               } ${draggedIndex === index ? "opacity-50" : ""}`}
             >
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-start gap-3">
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-blue-700 cursor-grab active:cursor-grabbing disabled:cursor-not-allowed"
+                  className="hidden md:inline-flex mt-1 text-gray-400 hover:text-blue-700 cursor-grab active:cursor-grabbing disabled:cursor-not-allowed shrink-0"
                   aria-label={`Drag to reorder ${item.alt}`}
                   disabled={item.id.startsWith("pending-") || savingOrder}
                 >
                   <GripVertical className="h-5 w-5" />
                 </button>
-                <div className="relative w-24 h-24 rounded-md overflow-hidden border border-gray-200">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden border border-gray-200 shrink-0">
                   <Image
                     src={item.thumbnail || item.src}
                     alt={item.alt}
@@ -508,18 +517,18 @@ export default function GalleryManager() {
                     unoptimized={bypassImageOptimization(item.thumbnail || item.src)}
                   />
                 </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 break-words">{item.alt}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {item.type === "video" ? "Video" : "Image"} · Position {index + 1} of {items.length}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{item.alt}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {item.type === "video" ? "Video" : "Image"} · Position {index + 1} of {items.length}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor={`position-${item.id}`} className="text-xs text-gray-500 whitespace-nowrap">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Label htmlFor={`position-${item.id}`} className="text-xs text-gray-500 whitespace-nowrap shrink-0">
                     Move to
                   </Label>
                   <Input
@@ -529,7 +538,7 @@ export default function GalleryManager() {
                     max={items.length}
                     defaultValue={index + 1}
                     key={`${item.id}-${index}`}
-                    className="w-20 h-9"
+                    className="h-11 flex-1 sm:w-20 sm:flex-none"
                     disabled={item.id.startsWith("pending-") || savingOrder}
                     onKeyDown={(event) => {
                       if (event.key !== "Enter") return
@@ -545,41 +554,70 @@ export default function GalleryManager() {
                     }}
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => moveItemToStart(index)}
-                  disabled={index === 0 || item.id.startsWith("pending-") || savingOrder}
-                  aria-label="Move to start"
-                >
-                  <ArrowUpToLine className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => moveItemToEnd(index)}
-                  disabled={index === items.length - 1 || item.id.startsWith("pending-") || savingOrder}
-                  aria-label="Move to end"
-                >
-                  <ArrowDownToLine className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="text-red-600 hover:text-red-700"
-                  onClick={() => handleDelete(item.id, item.type)}
-                  disabled={deletingId === item.id || item.type === "video"}
-                  aria-label="Delete image"
-                >
-                  {deletingId === item.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
+
+                <div className="grid grid-cols-3 gap-2 w-full sm:flex sm:w-auto sm:flex-wrap">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11"
+                    onClick={() => moveItemUp(index)}
+                    disabled={index === 0 || item.id.startsWith("pending-") || savingOrder}
+                    aria-label="Move up one position"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                    <span className="md:hidden ml-1">Up</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11"
+                    onClick={() => moveItemDown(index)}
+                    disabled={index === items.length - 1 || item.id.startsWith("pending-") || savingOrder}
+                    aria-label="Move down one position"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                    <span className="md:hidden ml-1">Down</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11"
+                    onClick={() => moveItemToStart(index)}
+                    disabled={index === 0 || item.id.startsWith("pending-") || savingOrder}
+                    aria-label="Move to start"
+                  >
+                    <ArrowUpToLine className="h-4 w-4" />
+                    <span className="sr-only">Start</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11"
+                    onClick={() => moveItemToEnd(index)}
+                    disabled={index === items.length - 1 || item.id.startsWith("pending-") || savingOrder}
+                    aria-label="Move to end"
+                  >
+                    <ArrowDownToLine className="h-4 w-4" />
+                    <span className="sr-only">End</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11 text-red-600 hover:text-red-700 col-span-2 sm:col-span-1"
+                    onClick={() => handleDelete(item.id, item.type)}
+                    disabled={deletingId === item.id || item.type === "video"}
+                    aria-label="Delete image"
+                  >
+                    {deletingId === item.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2 sm:mr-0" />
+                        <span className="sm:hidden">Delete</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
+import { useLocaleContext } from "@/components/locale-provider"
 
 export default function Promotions() {
+  const { dictionary } = useLocaleContext()
+  const promotions = dictionary.promotions
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -47,14 +50,14 @@ export default function Promotions() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          Special Offers
+          {promotions.title}
         </h2>
         <p
           className={`text-center text-gray-600 mb-6 max-w-2xl mx-auto transition-all duration-700 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          Take advantage of our amazing promotions and special offers at Sharky&apos;s Bar
+          {promotions.description}
         </p>
 
         <div

@@ -7,6 +7,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
+import LanguageSwitcher from "@/components/language-switcher"
+import { useLocaleContext } from "@/components/locale-provider"
+import { localizeHref, stripLocaleFromPathname } from "@/lib/i18n/navigation"
 
 const DEDICATED_PAGES = {
   menu: "/menu",
@@ -25,8 +28,10 @@ const HOME_SECTIONS = {
 } as const
 
 export default function Navbar() {
+  const { locale, dictionary } = useLocaleContext()
   const pathname = usePathname()
-  const isHomePage = pathname === "/"
+  const strippedPathname = stripLocaleFromPathname(pathname)
+  const isHomePage = strippedPathname === "/"
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("")
@@ -113,7 +118,7 @@ export default function Navbar() {
   }
 
   const isActive = (key: string) => {
-    if (pathname === DEDICATED_PAGES[key as keyof typeof DEDICATED_PAGES]) return true
+    if (strippedPathname === DEDICATED_PAGES[key as keyof typeof DEDICATED_PAGES]) return true
     return isHomePage && activeSection === key
   }
 
@@ -124,7 +129,7 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href={localizeHref("/", locale)} className="flex items-center gap-2 group">
           <div className="relative overflow-hidden">
             <Image
               src="/sharkys_logo.png"
@@ -145,88 +150,94 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden lg:flex space-x-6">
-          <NavLink href={HOME_SECTIONS.about} active={isActive("about")}>
-            About
+        <div className="hidden lg:flex items-center gap-6">
+          <NavLink href={localizeHref(HOME_SECTIONS.about, locale)} active={isActive("about")}>
+            {dictionary.nav.about}
           </NavLink>
-          <NavLink href={HOME_SECTIONS.gallery} active={isActive("gallery")}>
-            Gallery
+          <NavLink href={localizeHref(HOME_SECTIONS.gallery, locale)} active={isActive("gallery")}>
+            {dictionary.nav.gallery}
           </NavLink>
-          <NavLink href={HOME_SECTIONS.promotions} active={isActive("promotions")}>
-            Promotions
+          <NavLink href={localizeHref(HOME_SECTIONS.promotions, locale)} active={isActive("promotions")}>
+            {dictionary.nav.promotions}
           </NavLink>
-          <NavLink href={DEDICATED_PAGES.menu} active={isActive("menu")}>
-            Menu
+          <NavLink href={localizeHref(DEDICATED_PAGES.menu, locale)} active={isActive("menu")}>
+            {dictionary.nav.menu}
           </NavLink>
-          <NavLink href={DEDICATED_PAGES.location} active={isActive("location")}>
-            Location
+          <NavLink href={localizeHref(DEDICATED_PAGES.location, locale)} active={isActive("location")}>
+            {dictionary.nav.location}
           </NavLink>
-          <NavLink href={DEDICATED_PAGES["private-events"]} active={isActive("private-events")}>
-            Private Events
+          <NavLink href={localizeHref(DEDICATED_PAGES["private-events"], locale)} active={isActive("private-events")}>
+            {dictionary.nav.privateEvents}
           </NavLink>
-          <NavLink href={DEDICATED_PAGES.sports} active={isActive("sports")}>
-            Sports
+          <NavLink href={localizeHref(DEDICATED_PAGES.sports, locale)} active={isActive("sports")}>
+            {dictionary.nav.sports}
           </NavLink>
-          <NavLink href={HOME_SECTIONS.faq} active={isActive("faq")}>
-            FAQ
+          <NavLink href={localizeHref(HOME_SECTIONS.faq, locale)} active={isActive("faq")}>
+            {dictionary.nav.faq}
           </NavLink>
-          <NavLink href={HOME_SECTIONS.reviews} active={isActive("reviews")}>
-            Reviews
+          <NavLink href={localizeHref(HOME_SECTIONS.reviews, locale)} active={isActive("reviews")}>
+            {dictionary.nav.reviews}
           </NavLink>
-          <NavLink href={HOME_SECTIONS.contact} active={isActive("contact")}>
-            Contact
+          <NavLink href={localizeHref(HOME_SECTIONS.contact, locale)} active={isActive("contact")}>
+            {dictionary.nav.contact}
           </NavLink>
+          <LanguageSwitcher />
         </div>
 
-        <button
-          className="lg:hidden text-blue-900 focus:outline-none"
-          onClick={toggleMenu}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isOpen}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="lg:hidden flex items-center gap-3">
+          <LanguageSwitcher />
+          <button
+            className="text-blue-900 focus:outline-none"
+            onClick={toggleMenu}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       <div
-        className={`lg:hidden bg-white shadow-lg overflow-hidden transition-all duration-300 ${
-          isOpen ? "max-h-[32rem]" : "max-h-0"
+        className={`lg:hidden bg-white shadow-lg transition-[max-height] duration-300 ease-in-out ${
+          isOpen
+            ? "max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-gray-100"
+            : "max-h-0 overflow-hidden"
         }`}
       >
-        <div className="flex flex-col space-y-2 px-4 py-4">
-          <MobileNavLink href={HOME_SECTIONS.about} onClick={handleLinkClick} active={isActive("about")}>
-            About
+        <div className="flex flex-col space-y-1 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.about, locale)} onClick={handleLinkClick} active={isActive("about")}>
+            {dictionary.nav.about}
           </MobileNavLink>
-          <MobileNavLink href={HOME_SECTIONS.gallery} onClick={handleLinkClick} active={isActive("gallery")}>
-            Gallery
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.gallery, locale)} onClick={handleLinkClick} active={isActive("gallery")}>
+            {dictionary.nav.gallery}
           </MobileNavLink>
-          <MobileNavLink href={HOME_SECTIONS.promotions} onClick={handleLinkClick} active={isActive("promotions")}>
-            Promotions
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.promotions, locale)} onClick={handleLinkClick} active={isActive("promotions")}>
+            {dictionary.nav.promotions}
           </MobileNavLink>
-          <MobileNavLink href={DEDICATED_PAGES.menu} onClick={handleLinkClick} active={isActive("menu")}>
-            Menu
+          <MobileNavLink href={localizeHref(DEDICATED_PAGES.menu, locale)} onClick={handleLinkClick} active={isActive("menu")}>
+            {dictionary.nav.menu}
           </MobileNavLink>
-          <MobileNavLink href={DEDICATED_PAGES.location} onClick={handleLinkClick} active={isActive("location")}>
-            Location
+          <MobileNavLink href={localizeHref(DEDICATED_PAGES.location, locale)} onClick={handleLinkClick} active={isActive("location")}>
+            {dictionary.nav.location}
           </MobileNavLink>
           <MobileNavLink
-            href={DEDICATED_PAGES["private-events"]}
+            href={localizeHref(DEDICATED_PAGES["private-events"], locale)}
             onClick={handleLinkClick}
             active={isActive("private-events")}
           >
-            Private Events
+            {dictionary.nav.privateEvents}
           </MobileNavLink>
-          <MobileNavLink href={DEDICATED_PAGES.sports} onClick={handleLinkClick} active={isActive("sports")}>
-            Sports
+          <MobileNavLink href={localizeHref(DEDICATED_PAGES.sports, locale)} onClick={handleLinkClick} active={isActive("sports")}>
+            {dictionary.nav.sports}
           </MobileNavLink>
-          <MobileNavLink href={HOME_SECTIONS.faq} onClick={handleLinkClick} active={isActive("faq")}>
-            FAQ
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.faq, locale)} onClick={handleLinkClick} active={isActive("faq")}>
+            {dictionary.nav.faq}
           </MobileNavLink>
-          <MobileNavLink href={HOME_SECTIONS.reviews} onClick={handleLinkClick} active={isActive("reviews")}>
-            Reviews
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.reviews, locale)} onClick={handleLinkClick} active={isActive("reviews")}>
+            {dictionary.nav.reviews}
           </MobileNavLink>
-          <MobileNavLink href={HOME_SECTIONS.contact} onClick={handleLinkClick} active={isActive("contact")}>
-            Contact
+          <MobileNavLink href={localizeHref(HOME_SECTIONS.contact, locale)} onClick={handleLinkClick} active={isActive("contact")}>
+            {dictionary.nav.contact}
           </MobileNavLink>
         </div>
       </div>
@@ -266,7 +277,7 @@ function MobileNavLink({
   return (
     <Link
       href={href}
-      className={`text-blue-900 hover:text-blue-600 font-medium py-1.5 transition-colors flex items-center ${
+      className={`text-blue-900 hover:text-blue-600 font-medium py-2.5 transition-colors flex items-center min-h-[44px] ${
         active ? "text-blue-600 bg-blue-50 rounded pl-2" : ""
       }`}
       onClick={onClick}

@@ -24,6 +24,7 @@ import {
   tripAdvisorMeta,
 } from "@/lib/featured-reviews"
 import type { ReviewType } from "@/lib/types"
+import { useLocaleContext } from "@/components/locale-provider"
 
 function StarRating({ rating, source }: { rating: number; source?: ReviewType["source"] }) {
   const starClass = getReviewStarClass(source)
@@ -86,6 +87,7 @@ function RatingSummary({
   label,
   rating,
   reviewCount,
+  basedOnText,
   reviewLabel,
   starClass,
   labelClass,
@@ -93,6 +95,7 @@ function RatingSummary({
   label: string
   rating: number
   reviewCount: number
+  basedOnText: string
   reviewLabel: string
   starClass: string
   labelClass: string
@@ -126,7 +129,7 @@ function RatingSummary({
           </div>
         </div>
         <p className="text-gray-700 text-sm sm:text-base">
-          Based on <span className="font-semibold">{reviewCount}</span> {reviewLabel}
+          {basedOnText} <span className="font-semibold">{reviewCount}</span> {reviewLabel}
         </p>
       </div>
     </div>
@@ -134,6 +137,8 @@ function RatingSummary({
 }
 
 export default function TripAdvisorRating() {
+  const { dictionary } = useLocaleContext()
+  const reviews = dictionary.reviews
   const [isVisible, setIsVisible] = useState(false)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -192,11 +197,8 @@ export default function TripAdvisorRating() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">Customer Reviews</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Real feedback from TripAdvisor and Google guests who have visited Sharky&apos;s Bar at Marina de
-            Albufeira.
-          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-900">{reviews.title}</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">{reviews.subtitle}</p>
         </div>
 
         <div
@@ -209,7 +211,8 @@ export default function TripAdvisorRating() {
               label="TripAdvisor"
               rating={tripAdvisorMeta.rating}
               reviewCount={tripAdvisorMeta.reviewCount}
-              reviewLabel="TripAdvisor reviews"
+              basedOnText={reviews.basedOn}
+              reviewLabel={reviews.reviewsLabel}
               starClass="text-[#00AA6C] fill-[#00AA6C]"
               labelClass="text-[#00AA6C]"
             />
@@ -217,7 +220,8 @@ export default function TripAdvisorRating() {
               label="Google"
               rating={googleMeta.rating}
               reviewCount={googleMeta.reviewCount}
-              reviewLabel="Google reviews"
+              basedOnText={reviews.basedOn}
+              reviewLabel={reviews.reviewsLabel}
               starClass="text-yellow-500 fill-yellow-500"
               labelClass="text-[#4285F4]"
             />
@@ -258,7 +262,7 @@ export default function TripAdvisorRating() {
               rel="noopener noreferrer"
               className="inline-flex items-center px-6 py-3 bg-[#00AA6C] text-white rounded-md hover:bg-[#00945d] transition-all transform hover:scale-105 hover:shadow-lg"
             >
-              <span className="mr-2">TripAdvisor reviews</span>
+              <span className="mr-2">{reviews.readOnTripAdvisor}</span>
               <ExternalLink className="h-4 w-4" />
             </a>
             <a
@@ -267,7 +271,7 @@ export default function TripAdvisorRating() {
               rel="noopener noreferrer"
               className="inline-flex items-center px-6 py-3 bg-[#4285F4] text-white rounded-md hover:bg-[#3367d6] transition-all transform hover:scale-105 hover:shadow-lg"
             >
-              <span className="mr-2">Google reviews</span>
+              <span className="mr-2">{reviews.readOnGoogle}</span>
               <ExternalLink className="h-4 w-4" />
             </a>
           </div>
@@ -281,10 +285,15 @@ export default function TripAdvisorRating() {
           <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-6 text-center">
             <div className="flex items-center justify-center mb-3">
               <Facebook className="h-7 w-7 text-[#1877F2] mr-2" aria-hidden="true" />
-              <h3 className="text-lg font-bold text-blue-900">Facebook</h3>
+              <h3 className="text-lg font-bold text-blue-900">{reviews.facebookTitle}</h3>
             </div>
-            <p className="text-3xl font-bold text-[#1877F2] mb-2">{facebookRecommendPercent}% recommend</p>
-            <p className="text-gray-600 mb-4">Based on {facebookReviewCount} reviews</p>
+            <p className="text-3xl font-bold text-[#1877F2] mb-2">
+              {facebookRecommendPercent}
+              {reviews.facebookRecommend}
+            </p>
+            <p className="text-gray-600 mb-4">
+              {reviews.facebookBasedOn} {facebookReviewCount} {reviews.reviewsLabel}
+            </p>
             <a
               href={FACEBOOK_REVIEWS_URL}
               target="_blank"
@@ -297,10 +306,7 @@ export default function TripAdvisorRating() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-6 flex items-center">
-            <p className="text-gray-700 text-center w-full">
-              Visited us recently? Leave a review on TripAdvisor, Google, or Facebook — we appreciate every bit of
-              feedback.
-            </p>
+            <p className="text-gray-700 text-center w-full">{reviews.appreciation}</p>
           </div>
         </div>
       </div>

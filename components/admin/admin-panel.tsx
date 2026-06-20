@@ -129,7 +129,7 @@ export default function AdminPanel() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-100 flex items-center justify-center px-4">
         <Loader2 className="h-8 w-8 animate-spin text-blue-900" />
       </div>
     )
@@ -137,8 +137,8 @@ export default function AdminPanel() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+      <div className="min-h-dvh bg-slate-100 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 sm:p-8">
           <h1 className="text-2xl font-bold text-blue-900 mb-2">Sharky&apos;s Admin</h1>
           <p className="text-gray-600 mb-6">Sign in to manage site content.</p>
 
@@ -168,7 +168,7 @@ export default function AdminPanel() {
 
             {loginError && <p className="text-sm text-red-600">{loginError}</p>}
 
-            <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800" disabled={loggingIn}>
+            <Button type="submit" className="w-full min-h-11 bg-blue-900 hover:bg-blue-800" disabled={loggingIn}>
               {loggingIn ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -180,8 +180,12 @@ export default function AdminPanel() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <Button variant="outline" className="text-blue-900 border-blue-200 hover:bg-blue-50" asChild>
+          <div className="mt-6">
+            <Button
+              variant="outline"
+              className="w-full min-h-11 text-blue-900 border-blue-200 hover:bg-blue-50"
+              asChild
+            >
               <Link href="/">
                 <Home className="h-4 w-4 mr-2" />
                 Return to main site
@@ -194,32 +198,40 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="bg-blue-900 text-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-dvh bg-slate-100">
+      <header className="bg-blue-900 text-white pt-[env(safe-area-inset-top)]">
+        <div className="container mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold">Sharky&apos;s Admin</h1>
             <p className="text-blue-100 text-sm">Content management</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" className="text-blue-900 bg-white hover:bg-blue-50" asChild>
+          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:items-center">
+            <Button
+              variant="outline"
+              className="min-h-11 text-blue-900 bg-white hover:bg-blue-50 justify-center px-2 sm:px-4"
+              asChild
+            >
               <Link href="/">
-                <Home className="h-4 w-4 mr-2" />
-                Return to main site
+                <Home className="h-4 w-4 shrink-0" />
+                <span className="truncate">Home</span>
               </Link>
             </Button>
-            <Button variant="outline" className="text-blue-900 bg-white hover:bg-blue-50" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Log out
+            <Button
+              variant="outline"
+              className="min-h-11 text-blue-900 bg-white hover:bg-blue-50 justify-center px-2 sm:px-4"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span className="truncate">Log out</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <section className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-blue-900 mb-2">Add Sports Image</h2>
-          <p className="text-gray-600 mb-6">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-4xl">
+        <section className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-blue-900 mb-2">Add Sports Image</h2>
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Upload a new image for the weekend sports promo on the Live Sports section. The previous blob image will be
             deleted and replaced.
           </p>
@@ -273,7 +285,7 @@ export default function AdminPanel() {
 
             <Button
               type="submit"
-              className="bg-blue-900 hover:bg-blue-800"
+              className="w-full sm:w-auto min-h-11 bg-blue-900 hover:bg-blue-800"
               disabled={uploading || !selectedFile}
             >
               {uploading ? (
@@ -293,11 +305,11 @@ export default function AdminPanel() {
 
         <GalleryManager />
 
-        <div className="mt-6 text-center space-y-2">
-          <Link href="/#sports" className="text-sm text-blue-700 hover:underline block">
+        <div className="mt-6 text-center space-y-3 pb-2">
+          <Link href="/#sports" className="inline-block text-sm text-blue-700 hover:underline py-2">
             View sports section on homepage
           </Link>
-          <Link href="/#gallery" className="text-sm text-blue-700 hover:underline block">
+          <Link href="/#gallery" className="inline-block text-sm text-blue-700 hover:underline py-2">
             View gallery on homepage
           </Link>
         </div>

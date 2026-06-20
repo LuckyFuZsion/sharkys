@@ -2,240 +2,73 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from "next/image"
 import { Utensils, Coffee, Wine, Beer, Martini, Droplet, ChevronDown, ChevronUp } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import Script from "next/script"
+import { useLocaleContext } from "@/components/locale-provider"
+import type { MenuItemsMap } from "@/lib/i18n/menu-item-keys"
+import {
+  breakfastItemsData,
+  breakfastDrinksData,
+  cocktailsData,
+  kidsCocktailsData,
+  milkshakesData,
+  shotsData,
+  wineItemsData,
+  spiritsData,
+  whiskeysData,
+  draughtLagerData,
+  bottlesAndCansData,
+  softDrinksData,
+  hotDrinksData,
+  type MenuDataEntry,
+} from "@/lib/menu-data"
 
 type MenuItem = { name: string; description: string; price: string }
 
 const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
-const breakfastItems: MenuItem[] = [
-  {
-    name: "The Classic Full English",
-    description: "Sausage, bacon, egg, tomato, beans & toast",
-    price: formatPrice(7.5),
-  },
-  {
-    name: "The Shark Attack",
-    description: "Double sausage, double bacon, double egg, tomato, mushrooms, beans & toast",
-    price: formatPrice(10),
-  },
-  {
-    name: "The Veggie Breakfast",
-    description: "Vegan sausage, egg, tomato, mushrooms, beans & toast",
-    price: formatPrice(8),
-  },
-  {
-    name: "Breakfast Burrito",
-    description: "Sausage, bacon, scrambled egg & cheese in a wrap",
-    price: formatPrice(7.5),
-  },
-  {
-    name: "Breakfast Butty",
-    description: "Fresh roll with one filling (bacon, sausage, egg, or mushrooms)",
-    price: formatPrice(4),
-  },
-  {
-    name: "Scrambled Egg on Toast",
-    description: "",
-    price: formatPrice(6),
-  },
-  {
-    name: "Mixed Toastie (Cheese & Ham)",
-    description: "",
-    price: formatPrice(4),
-  },
-]
-
-const breakfastDrinks: MenuItem[] = [
-  { name: "White Coffee", description: "", price: formatPrice(3) },
-  { name: "Americano", description: "", price: formatPrice(3) },
-  { name: "Cappuccino", description: "", price: formatPrice(3) },
-  { name: "Tea", description: "", price: formatPrice(3) },
-  { name: "Latte", description: "", price: formatPrice(3) },
-  { name: "Hot Chocolate", description: "", price: formatPrice(4) },
-  { name: "Iced Coffee", description: "", price: formatPrice(5.5) },
-  { name: "Fresh Orange Juice", description: "", price: formatPrice(4.5) },
-  { name: "Pineapple / Lemon / Apple Juice", description: "", price: formatPrice(3.5) },
-  { name: "Water", description: "", price: formatPrice(2) },
-  { name: "Sparkling Water", description: "", price: formatPrice(2.5) },
-  { name: "Coke / Diet Coke / 7UP / Fanta / Ice Tea", description: "", price: formatPrice(2.5) },
-]
-
-const cocktails: MenuItem[] = [
-  {
-    name: "Sex on the Beach",
-    description: "Vodka, peach schnapps, orange & grenadine",
-    price: formatPrice(9),
-  },
-  {
-    name: "Shark's Lagoon",
-    description: "Vodka, blue curaçao, 7UP & lemon",
-    price: formatPrice(9),
-  },
-  { name: "Piña Colada", description: "Rum, coconut cream & pineapple", price: formatPrice(9) },
-  { name: "Tequila Sunrise", description: "Tequila, orange & grenadine", price: formatPrice(9) },
-  { name: "Cosmopolitan", description: "Vodka, cranberry & lime", price: formatPrice(9) },
-  {
-    name: "Brandy Alexander",
-    description: "Brandy, brown curaçao & fresh cream",
-    price: formatPrice(9),
-  },
-  {
-    name: "Bloody Mary",
-    description: "Vodka, tomato juice, Worcester sauce & Tabasco",
-    price: formatPrice(9),
-  },
-  { name: "Caipirinha", description: "Brown sugar, lime & cachaça", price: formatPrice(9) },
-  { name: "Aperol Spritz", description: "Aperol, prosecco, soda & water", price: formatPrice(9) },
-  { name: "Woo Woo", description: "Vodka, peach & cranberry", price: formatPrice(9) },
-  { name: "Espresso Martini", description: "Vodka, coffee & liqueur", price: formatPrice(9) },
-  {
-    name: "Strawberry Daiquiri",
-    description: "Rum, lemon & fresh strawberry",
-    price: formatPrice(9.5),
-  },
-  {
-    name: "Strawberry Mojito",
-    description: "Rum, mint, lime & soda water",
-    price: formatPrice(9.5),
-  },
-  {
-    name: "Mojito",
-    description: "Rum, brown sugar, mint, lime & soda water",
-    price: formatPrice(9.5),
-  },
-  {
-    name: "Long Island Iced Tea",
-    description: "Vodka, rum, gin, tequila, triple sec, coke, lemon & lime",
-    price: formatPrice(10),
-  },
-]
-
-const kidsCocktails: MenuItem[] = [
-  { name: "Bubble Blast", description: "Apple, blackcurrant & fizzy water", price: formatPrice(6) },
-  { name: "Under the Sea", description: "Tropical mango, pineapple & lemon", price: formatPrice(6) },
-  { name: "Sharky's Sunrise", description: "Orange, strawberry & 7UP", price: formatPrice(6) },
-]
-
-const shots: MenuItem[] = [
-  { name: "Flavoured Sours", description: "", price: formatPrice(3.5) },
-  { name: "Tequila", description: "", price: formatPrice(3.5) },
-  { name: "Sambuca", description: "", price: formatPrice(3.5) },
-  { name: "Baby Guinness", description: "", price: formatPrice(3.5) },
-  { name: "Jager Bomb", description: "", price: formatPrice(4.5) },
-]
-
-const wineItems: MenuItem[] = [
-  { name: "Glass of House Wine", description: "", price: formatPrice(3.8) },
-  { name: "Bottle of Wine", description: "", price: formatPrice(18) },
-  { name: "Glass of Sangria", description: "", price: formatPrice(4.5) },
-  { name: "1L Jug of Sangria", description: "", price: formatPrice(17) },
-  { name: "Bottle of Prosecco", description: "", price: formatPrice(20) },
-  { name: "Bottle of Champagne", description: "", price: formatPrice(30) },
-  { name: "Porto", description: "", price: formatPrice(4) },
-]
-
-const spirits: MenuItem[] = [
-  { name: "Gordon's Gin", description: "", price: formatPrice(5.5) },
-  { name: "Pink Gordon's Gin", description: "", price: formatPrice(6) },
-  { name: "Beefeater Gin", description: "", price: formatPrice(6.5) },
-  { name: "Tanqueray Gin", description: "", price: formatPrice(6.5) },
-  { name: "Bombay Gin", description: "", price: formatPrice(6.5) },
-  { name: "Smirnoff Vodka", description: "", price: formatPrice(5) },
-  { name: "Bacardi", description: "", price: formatPrice(5.5) },
-  { name: "Captain Morgan's / Spice", description: "", price: formatPrice(5.5) },
-  { name: "Malibu", description: "", price: formatPrice(5) },
-  { name: "Baileys", description: "", price: formatPrice(7) },
-  { name: "Tia Maria", description: "", price: formatPrice(5.5) },
-  { name: "Pimms", description: "", price: formatPrice(5.5) },
-  { name: "Amaretto", description: "", price: formatPrice(5.5) },
-  { name: "Cointreau", description: "", price: formatPrice(6.5) },
-  { name: "Licor Beirão", description: "", price: formatPrice(5) },
-  { name: "Martini", description: "", price: formatPrice(5) },
-]
-
-const whiskeys: MenuItem[] = [
-  { name: "JB", description: "", price: formatPrice(5) },
-  { name: "William Lawson", description: "", price: formatPrice(5.5) },
-  { name: "Famous Grouse", description: "", price: formatPrice(5.5) },
-  { name: "Jameson", description: "", price: formatPrice(5.5) },
-  { name: "Jack Daniels", description: "", price: formatPrice(5.5) },
-  { name: "Southern Comfort", description: "", price: formatPrice(5.5) },
-  { name: "Canadian Club", description: "", price: formatPrice(5.5) },
-  { name: "Glenfiddich", description: "", price: formatPrice(8) },
-  { name: "Cardu", description: "", price: formatPrice(8) },
-  { name: "Macieira", description: "", price: formatPrice(5) },
-  { name: "Drambuie", description: "", price: formatPrice(7) },
-  { name: "Hennessy", description: "", price: formatPrice(7) },
-]
-
-const draughtLager: MenuItem[] = [
-  { name: "Large Super Bock", description: "", price: formatPrice(3.8) },
-  { name: "Small Super Bock", description: "", price: formatPrice(2) },
-  { name: "Large Carlsberg", description: "", price: formatPrice(4) },
-  { name: "Small Carlsberg", description: "", price: formatPrice(2) },
-]
-
-const bottlesAndCans: MenuItem[] = [
-  { name: "Non-Alcoholic", description: "", price: formatPrice(4) },
-  { name: "Super Bock", description: "", price: formatPrice(3.5) },
-  { name: "Sagres", description: "", price: formatPrice(3.5) },
-  { name: "Peroni", description: "", price: formatPrice(5.5) },
-  { name: "Coors", description: "", price: formatPrice(5) },
-  { name: "Corona", description: "", price: formatPrice(5) },
-  { name: "Somersby (Apple or Blackberry)", description: "", price: formatPrice(5) },
-  { name: "Kopparberg", description: "", price: formatPrice(6) },
-  { name: "Magners", description: "", price: formatPrice(7) },
-  { name: "Strongbow", description: "", price: formatPrice(6) },
-  { name: "Guinness", description: "", price: formatPrice(6) },
-  { name: "Smirnoff Ice", description: "", price: formatPrice(5.5) },
-  { name: "Blue WKD", description: "", price: formatPrice(5.5) },
-]
-
-const softDrinks: MenuItem[] = [
-  { name: "Cola / Cola Zero / 7UP / Fanta / Ice Tea", description: "", price: formatPrice(2.5) },
-  { name: "Red Bull", description: "", price: formatPrice(4) },
-  {
-    name: "Juices",
-    description: "Orange, Lemon, Pineapple, Apple, Cranberry, Tomato",
-    price: formatPrice(3.5),
-  },
-  { name: "Water", description: "", price: formatPrice(2) },
-  { name: "Sparkling Water", description: "", price: formatPrice(2.5) },
-  { name: "Tonic Water", description: "", price: formatPrice(2.5) },
-  { name: "Ginger Ale", description: "", price: formatPrice(2.5) },
-]
-
-const hotDrinks: MenuItem[] = [
-  { name: "Espresso", description: "", price: formatPrice(1.5) },
-  { name: "Coffee with Milk", description: "", price: formatPrice(3) },
-  { name: "Americano", description: "", price: formatPrice(3) },
-  { name: "Cappuccino", description: "", price: formatPrice(3) },
-  { name: "Café Latte", description: "", price: formatPrice(3) },
-  { name: "Tea", description: "", price: formatPrice(3) },
-  { name: "Hot Chocolate", description: "", price: formatPrice(4) },
-  { name: "Irish Coffee", description: "", price: formatPrice(6) },
-  { name: "Ice Coffee", description: "", price: formatPrice(4) },
-]
+function resolveMenuItems(data: MenuDataEntry[], items: MenuItemsMap): MenuItem[] {
+  return data.map(({ key, price }) => ({
+    name: items[key].name,
+    description: items[key].description,
+    price: formatPrice(price),
+  }))
+}
 
 export default function Menu() {
+  const { dictionary } = useLocaleContext()
+  const menu = dictionary.menu
   const isMobile = useMobile()
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
-
   const [openSection, setOpenSection] = useState<string | null>(null)
 
+  const breakfastItems = useMemo(
+    () => resolveMenuItems(breakfastItemsData, menu.items),
+    [menu.items],
+  )
+  const breakfastDrinks = useMemo(
+    () => resolveMenuItems(breakfastDrinksData, menu.items),
+    [menu.items],
+  )
+  const cocktails = useMemo(() => resolveMenuItems(cocktailsData, menu.items), [menu.items])
+  const kidsCocktails = useMemo(() => resolveMenuItems(kidsCocktailsData, menu.items), [menu.items])
+  const milkshakes = useMemo(() => resolveMenuItems(milkshakesData, menu.items), [menu.items])
+  const shots = useMemo(() => resolveMenuItems(shotsData, menu.items), [menu.items])
+  const wineItems = useMemo(() => resolveMenuItems(wineItemsData, menu.items), [menu.items])
+  const spirits = useMemo(() => resolveMenuItems(spiritsData, menu.items), [menu.items])
+  const whiskeys = useMemo(() => resolveMenuItems(whiskeysData, menu.items), [menu.items])
+  const draughtLager = useMemo(() => resolveMenuItems(draughtLagerData, menu.items), [menu.items])
+  const bottlesAndCans = useMemo(() => resolveMenuItems(bottlesAndCansData, menu.items), [menu.items])
+  const softDrinks = useMemo(() => resolveMenuItems(softDrinksData, menu.items), [menu.items])
+  const hotDrinks = useMemo(() => resolveMenuItems(hotDrinksData, menu.items), [menu.items])
+
   const toggleSection = (section: string) => {
-    if (openSection === section) {
-      setOpenSection(null)
-    } else {
-      setOpenSection(section)
-    }
+    setOpenSection(openSection === section ? null : section)
   }
 
   useEffect(() => {
@@ -269,14 +102,20 @@ export default function Menu() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        <p className="font-medium">🍳 BREAKFAST MENU</p>
-        <p className="text-sm mt-1">Start your day the Sharky&apos;s way</p>
+        <p className="font-medium">{menu.breakfastBanner}</p>
+        <p className="text-sm mt-1">{menu.breakfastSubtext}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-        <MenuCategory title="Breakfast" items={breakfastItems} isVisible={isVisible} delay={100} direction="left" />
         <MenuCategory
-          title="Breakfast Drinks"
+          title={menu.categories.breakfast}
+          items={breakfastItems}
+          isVisible={isVisible}
+          delay={100}
+          direction="left"
+        />
+        <MenuCategory
+          title={menu.categories.breakfastDrinks}
           items={breakfastDrinks}
           isVisible={isVisible}
           delay={200}
@@ -290,12 +129,9 @@ export default function Menu() {
         }`}
         style={{ transitionDelay: "400ms" }}
       >
-        <h3 className="text-xl font-bold mb-2">Breakfast Special — Full Monty English Breakfast</h3>
+        <h3 className="text-xl font-bold mb-2">{menu.fullMonty.title}</h3>
         <p className="font-medium text-lg">{formatPrice(10)}</p>
-        <p className="mt-2 text-blue-100">
-          Includes: 2 eggs, 2 bacon, 2 sausages, hash browns, tomato, black pudding, beans & toast. Served with a mug
-          of tea or cup of coffee.
-        </p>
+        <p className="mt-2 text-blue-100">{menu.fullMonty.includes}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
@@ -305,8 +141,8 @@ export default function Menu() {
           }`}
           style={{ transitionDelay: "500ms" }}
         >
-          <p className="font-medium">Extras for Butty</p>
-          <p>Bacon +€1.50 | Sausage +€1.50 | Egg +€1.50 | Mushrooms +€1.50</p>
+          <p className="font-medium">{menu.extras.buttyTitle}</p>
+          <p>{menu.extras.buttyItems}</p>
         </div>
         <div
           className={`bg-blue-50 p-3 rounded-md text-sm text-blue-800 transition-all duration-500 ${
@@ -314,8 +150,8 @@ export default function Menu() {
           }`}
           style={{ transitionDelay: "550ms" }}
         >
-          <p className="font-medium">Add-ons</p>
-          <p>Hash browns +€2.00 | Black pudding +€2.00</p>
+          <p className="font-medium">{menu.extras.addOnsTitle}</p>
+          <p>{menu.extras.addOnsItems}</p>
         </div>
       </div>
 
@@ -326,15 +162,15 @@ export default function Menu() {
       >
         <Image
           src="/images/food7.jpg"
-          alt="Breakfast at Sharky's Bar"
+          alt={menu.imageAltBreakfast}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 768px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-4 text-white">
-            <h4 className="font-bold text-lg">Freshly Prepared</h4>
-            <p className="text-sm">Hearty breakfasts made to order every morning</p>
+            <h4 className="font-bold text-lg">{menu.freshlyPrepared}</h4>
+            <p className="text-sm">{menu.freshlyPreparedDesc}</p>
           </div>
         </div>
       </div>
@@ -345,37 +181,49 @@ export default function Menu() {
     <div className="space-y-8">
       <div className="bg-blue-600 text-white p-4 rounded-lg mb-6 shadow-lg transform hover:scale-[1.01] transition-transform">
         <div className="flex items-center justify-center">
-          <h3 className="text-xl font-bold">SUNSET SPECIAL</h3>
+          <h3 className="text-xl font-bold">{menu.sunsetSpecial}</h3>
         </div>
-        <p className="text-center font-medium text-lg mt-1">Half-price cocktails between 6pm and 8pm!</p>
+        <p className="text-center font-medium text-lg mt-1">{menu.sunsetDesc}</p>
         <div className="text-center mt-2">
           <a href="#promotions" className="text-sm text-blue-100 hover:text-white underline">
-            See our Sunset Special promotion for details
+            {menu.sunsetPromoLink}
           </a>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-        <MenuCategory title="Cocktails" items={cocktails} isVisible={isVisible} delay={100} direction="left" />
+        <MenuCategory
+          title={menu.categories.cocktails}
+          items={cocktails}
+          isVisible={isVisible}
+          delay={100}
+          direction="left"
+        />
 
         <div className="space-y-8">
-          <MenuCategory title="Kids Cocktails" items={kidsCocktails} isVisible={isVisible} delay={300} direction="right" />
+          <MenuCategory
+            title={menu.categories.kidsCocktails}
+            items={kidsCocktails}
+            isVisible={isVisible}
+            delay={300}
+            direction="right"
+          />
 
           <MenuCategory
-            title="Milkshakes | Batidos"
-            items={[
-              {
-                name: "Chocolate, Vanilla, Banana or Strawberry",
-                description: "",
-                price: formatPrice(6),
-              },
-            ]}
+            title={menu.categories.milkshakes}
+            items={milkshakes}
             isVisible={isVisible}
             delay={400}
             direction="right"
           />
 
-          <MenuCategory title="Shots" items={shots} isVisible={isVisible} delay={500} direction="right" />
+          <MenuCategory
+            title={menu.categories.shots}
+            items={shots}
+            isVisible={isVisible}
+            delay={500}
+            direction="right"
+          />
         </div>
       </div>
 
@@ -386,15 +234,15 @@ export default function Menu() {
       >
         <Image
           src="/images/food10.jpg"
-          alt="Our signature cocktails"
+          alt={menu.imageAltCocktails}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 768px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-4 text-white">
-            <h4 className="font-bold text-lg">Expertly Crafted</h4>
-            <p className="text-sm">Our cocktails are made with premium ingredients</p>
+            <h4 className="font-bold text-lg">{menu.expertlyCrafted}</h4>
+            <p className="text-sm">{menu.expertlyCraftedDesc}</p>
           </div>
         </div>
       </div>
@@ -405,7 +253,7 @@ export default function Menu() {
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-8">
         <MenuCategory
-          title="Draught Lager | Cervejas"
+          title={menu.categories.draughtLager}
           items={draughtLager}
           isVisible={isVisible}
           delay={100}
@@ -413,7 +261,7 @@ export default function Menu() {
         />
 
         <MenuCategory
-          title="Bottles & Cans"
+          title={menu.categories.bottlesAndCans}
           items={bottlesAndCans}
           isVisible={isVisible}
           delay={300}
@@ -426,10 +274,16 @@ export default function Menu() {
   const wineSection = (
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-8">
-        <MenuCategory title="Wine | Vinho" items={wineItems} isVisible={isVisible} delay={100} direction="left" />
+        <MenuCategory
+          title={menu.categories.wine}
+          items={wineItems}
+          isVisible={isVisible}
+          delay={100}
+          direction="left"
+        />
 
         <MenuCategory
-          title="Spirits (Without Mix)"
+          title={menu.categories.spirits}
           items={spirits}
           isVisible={isVisible}
           delay={300}
@@ -437,7 +291,7 @@ export default function Menu() {
         />
 
         <MenuCategory
-          title="Whiskeys & Brandys"
+          title={menu.categories.whiskeysBrandys}
           items={whiskeys}
           isVisible={isVisible}
           delay={500}
@@ -451,7 +305,7 @@ export default function Menu() {
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-8">
         <MenuCategory
-          title="Soft Drinks | Refrigerantes"
+          title={menu.categories.softDrinks}
           items={softDrinks}
           isVisible={isVisible}
           delay={100}
@@ -465,9 +319,9 @@ export default function Menu() {
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-8">
         <MenuCategory
-          title="Hot Drinks | Cafés"
+          title={menu.categories.hotDrinks}
           items={hotDrinks}
-          note="Add Vanilla or Caramel +€0.50"
+          note={menu.hotDrinksNote}
           isVisible={isVisible}
           delay={100}
           direction="left"
@@ -479,7 +333,7 @@ export default function Menu() {
   const MobileMenu = () => (
     <div className="space-y-4">
       <MenuAccordionItem
-        title="Breakfast"
+        title={menu.tabs.breakfast}
         icon={<Utensils className="h-5 w-5" />}
         isOpen={openSection === "breakfast"}
         onClick={() => toggleSection("breakfast")}
@@ -490,7 +344,7 @@ export default function Menu() {
       </MenuAccordionItem>
 
       <MenuAccordionItem
-        title="Cocktails"
+        title={menu.tabs.cocktails}
         icon={<Martini className="h-5 w-5" />}
         isOpen={openSection === "cocktails"}
         onClick={() => toggleSection("cocktails")}
@@ -501,7 +355,7 @@ export default function Menu() {
       </MenuAccordionItem>
 
       <MenuAccordionItem
-        title="Beer & Cider"
+        title={menu.tabs.beer}
         icon={<Beer className="h-5 w-5" />}
         isOpen={openSection === "beer"}
         onClick={() => toggleSection("beer")}
@@ -512,7 +366,7 @@ export default function Menu() {
       </MenuAccordionItem>
 
       <MenuAccordionItem
-        title="Wine & Spirits"
+        title={menu.tabs.wine}
         icon={<Wine className="h-5 w-5" />}
         isOpen={openSection === "wine"}
         onClick={() => toggleSection("wine")}
@@ -523,7 +377,7 @@ export default function Menu() {
       </MenuAccordionItem>
 
       <MenuAccordionItem
-        title="Soft Drinks"
+        title={menu.tabs.nonAlcoholic}
         icon={<Droplet className="h-5 w-5" />}
         isOpen={openSection === "nonalcoholic"}
         onClick={() => toggleSection("nonalcoholic")}
@@ -534,7 +388,7 @@ export default function Menu() {
       </MenuAccordionItem>
 
       <MenuAccordionItem
-        title="Hot Drinks"
+        title={menu.tabs.hotDrinks}
         icon={<Coffee className="h-5 w-5" />}
         isOpen={openSection === "hot"}
         onClick={() => toggleSection("hot")}
@@ -555,27 +409,27 @@ export default function Menu() {
       >
         <TabsTrigger value="breakfast" className="flex items-center gap-2">
           <Utensils className="h-4 w-4" />
-          <span className="hidden sm:inline">Breakfast</span>
+          <span className="hidden sm:inline">{menu.tabs.breakfast}</span>
         </TabsTrigger>
         <TabsTrigger value="cocktails" className="flex items-center gap-2">
           <Martini className="h-4 w-4" />
-          <span className="hidden sm:inline">Cocktails</span>
+          <span className="hidden sm:inline">{menu.tabs.cocktails}</span>
         </TabsTrigger>
         <TabsTrigger value="beer" className="flex items-center gap-2">
           <Beer className="h-4 w-4" />
-          <span className="hidden sm:inline">Beer & Cider</span>
+          <span className="hidden sm:inline">{menu.tabs.beer}</span>
         </TabsTrigger>
         <TabsTrigger value="wine" className="flex items-center gap-2">
           <Wine className="h-4 w-4" />
-          <span className="hidden sm:inline">Wine & Spirits</span>
+          <span className="hidden sm:inline">{menu.tabs.wine}</span>
         </TabsTrigger>
         <TabsTrigger value="nonalcoholic" className="flex items-center gap-2">
           <Droplet className="h-4 w-4" />
-          <span className="hidden sm:inline">Soft Drinks</span>
+          <span className="hidden sm:inline">{menu.tabs.nonAlcoholic}</span>
         </TabsTrigger>
         <TabsTrigger value="hot" className="flex items-center gap-2">
           <Coffee className="h-4 w-4" />
-          <span className="hidden sm:inline">Hot Drinks</span>
+          <span className="hidden sm:inline">{menu.tabs.hotDrinks}</span>
         </TabsTrigger>
       </TabsList>
 
@@ -591,12 +445,12 @@ export default function Menu() {
   const menuStructuredData = {
     "@context": "https://schema.org",
     "@type": "Menu",
-    name: "Sharky's Bar Menu",
-    description: "Breakfast and drinks menu for Sharky's Bar in Marina de Albufeira",
+    name: menu.ourMenu,
+    description: menu.schemaDescription,
     hasMenuSection: [
       {
         "@type": "MenuSection",
-        name: "Breakfast",
+        name: menu.categories.breakfast,
         hasMenuItem: breakfastItems.slice(0, 3).map((item) => ({
           "@type": "MenuItem",
           name: item.name,
@@ -610,7 +464,7 @@ export default function Menu() {
       },
       {
         "@type": "MenuSection",
-        name: "Cocktails",
+        name: menu.categories.cocktails,
         hasMenuItem: cocktails.slice(0, 2).map((item) => ({
           "@type": "MenuItem",
           name: item.name,
@@ -646,14 +500,14 @@ export default function Menu() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          Our Menu
+          {menu.title}
         </h2>
         <p
           className={`text-center text-gray-600 mb-12 max-w-2xl mx-auto transition-all duration-500 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          From hearty breakfasts to expertly crafted cocktails, we have something for everyone at Sharky&apos;s Bar.
+          {menu.description}
         </p>
 
         {isMobile ? <MobileMenu /> : <DesktopMenu />}

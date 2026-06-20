@@ -4,8 +4,12 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { useLocaleContext } from "@/components/locale-provider"
+import { localizeHref } from "@/lib/i18n/navigation"
 
 export default function Hero() {
+  const { locale, dictionary } = useLocaleContext()
+  const hero = dictionary.hero
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -23,7 +27,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0" style={{ transform: `translateY(${scrollY * 0.15}px)` }}>
         <Image
           src="/decking.jpg"
-          alt="Sharky's Bar Decking with beautiful marina view"
+          alt={hero.alt}
           fill
           priority
           className="object-cover scale-110"
@@ -49,32 +53,27 @@ export default function Hero() {
         style={{ transform: `translateY(${-scrollY * 0.1}px)` }}
       >
         <h1 className="text-4xl md:text-6xl font-bold mb-4 text-shadow animate-fade-in-up">
-          Welcome to{" "}
-          <span className="text-blue-400 relative inline-block">
-            Sharky&apos;s Bar
-            <span className="absolute -bottom-2 left-0 w-full h-1 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-          </span>
+          {hero.welcome}
         </h1>
         <p className="text-xl md:text-2xl mb-6 max-w-2xl text-shadow animate-fade-in-up animation-delay-200">
-          Waterfront sports bar at Marina de Albufeira. Breakfast, live sports on multiple screens, and handcrafted
-          cocktails with stunning marina views.
+          {hero.tagline}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
-          <Link href="/menu" aria-label="View our food and drinks menu">
+          <Link href={localizeHref("/menu", locale)} aria-label="View our food and drinks menu">
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/50"
             >
-              View Our Menu
+              {hero.viewMenu}
             </Button>
           </Link>
-          <Link href="/location" aria-label="Find our location and contact information">
+          <Link href={localizeHref("/location", locale)} aria-label="Find our location and contact information">
             <Button
               size="lg"
               variant="outline"
               className="border-white text-blue-400 hover:bg-white/10 transform hover:scale-105 transition-all backdrop-blur-sm"
             >
-              Find Us
+              {hero.findUs}
             </Button>
           </Link>
         </div>

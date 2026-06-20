@@ -5,6 +5,8 @@ import Image from "next/image"
 import type React from "react"
 import Link from "next/link"
 import { Facebook, Phone, Mail, MapPin, Clock } from "lucide-react"
+import { useLocaleContext } from "@/components/locale-provider"
+import { localizeHref } from "@/lib/i18n/navigation"
 
 // Custom WhatsApp icon component
 const WhatsAppIcon = () => (
@@ -24,6 +26,8 @@ const WhatsAppIcon = () => (
 )
 
 export default function Footer() {
+  const { locale, dictionary } = useLocaleContext()
+  const footer = dictionary.footer
   const [isVisible, setIsVisible] = useState(false)
   const footerRef = useRef<HTMLElement>(null)
 
@@ -71,10 +75,7 @@ export default function Footer() {
             }`}
           >
             <h3 className="text-xl font-bold mb-4">Sharky&apos;s Bar</h3>
-            <p className="mb-4">
-              A friendly sports bar overlooking Marina de Albufeira. Breakfast, cocktails, live sports, and marina
-              views — the perfect spot to relax in the Algarve.
-            </p>
+            <p className="mb-4">{footer.tagline}</p>
             <div className="flex space-x-4">
               <SocialLink href="https://facebook.com" icon={<Facebook className="h-5 w-5" />} />
               <SocialLink href="tel:+351914120017" icon={<Phone className="h-5 w-5" />} />
@@ -82,7 +83,7 @@ export default function Footer() {
               <SocialLink
                 href="https://wa.me/351914120017"
                 icon={<WhatsAppIcon />}
-                ariaLabel="Contact us on WhatsApp"
+                ariaLabel={footer.whatsapp}
               />
             </div>
           </div>
@@ -92,7 +93,7 @@ export default function Footer() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
-            <h3 className="text-xl font-bold mb-4">Contact Us</h3>
+            <h3 className="text-xl font-bold mb-4">{footer.contactUs}</h3>
             <address className="space-y-3 not-italic">
               <div className="flex items-start group">
                 <MapPin
@@ -133,7 +134,7 @@ export default function Footer() {
                   aria-hidden="true"
                 />
                 <div className="group-hover:text-blue-200 transition-colors">
-                  <p>Every day until late</p>
+                  <p>{footer.hours}</p>
                 </div>
               </div>
               <div className="flex items-center group">
@@ -149,7 +150,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-blue-300 transition-colors group-hover:translate-x-1 transform transition-transform"
                 >
-                  WhatsApp Us
+                  {footer.whatsapp}
                 </a>
               </div>
             </address>
@@ -160,66 +161,96 @@ export default function Footer() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
-            <h3 className="text-xl font-bold mb-4">Quick Links</h3>
+            <h3 className="text-xl font-bold mb-4">{footer.quickLinks}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/#about" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/#about", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  About Us
+                  {footer.aboutUs}
                 </Link>
               </li>
               <li>
-                <Link href="/#gallery" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/#gallery", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Gallery
+                  {footer.gallery}
                 </Link>
               </li>
               <li>
-                <Link href="/#promotions" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/#promotions", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Promotions
+                  {footer.promotions}
                 </Link>
               </li>
               <li>
-                <Link href="/menu" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/menu", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Menu
+                  {footer.menu}
                 </Link>
               </li>
               <li>
-                <Link href="/location" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/location", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Location
+                  {footer.location}
                 </Link>
               </li>
               <li>
-                <Link href="/private-events" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/private-events", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Private Events
+                  {footer.privateEvents}
                 </Link>
               </li>
               <li>
-                <Link href="/sports" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/sports", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Live Sports
+                  {footer.sports}
                 </Link>
               </li>
               <li>
-                <Link href="/#reviews" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/#reviews", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Reviews
+                  {footer.reviews}
                 </Link>
               </li>
               <li>
-                <Link href="/#faq" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/#faq", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  FAQ
+                  {footer.faq}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-blue-300 transition-colors flex items-center group">
+                <Link
+                  href={localizeHref("/privacy", locale)}
+                  className="hover:text-blue-300 transition-colors flex items-center group"
+                >
                   <span className="w-0 h-0.5 bg-blue-400 mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
-                  Privacy Policy
+                  {footer.privacy}
                 </Link>
               </li>
             </ul>
@@ -233,9 +264,9 @@ export default function Footer() {
         >
           <div className="flex flex-col items-center">
             <p className="mb-4">
-              &copy; {new Date().getFullYear()} Sharky&apos;s Bar. All rights reserved.{" "}
-              <Link href="/privacy" className="hover:text-white underline underline-offset-2">
-                Privacy Policy
+              &copy; {new Date().getFullYear()} Sharky&apos;s Bar. {footer.copyright}{" "}
+              <Link href={localizeHref("/privacy", locale)} className="hover:text-white underline underline-offset-2">
+                {footer.privacy}
               </Link>
             </p>
 
@@ -245,7 +276,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="transition-opacity hover:opacity-80 mt-3"
-              aria-label="WebFuzsion - Web Design Studio"
+              aria-label={footer.designedBy}
             >
               <Image
                 src="/webfuzsion-icon.png"

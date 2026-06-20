@@ -8,8 +8,11 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { DEFAULT_GALLERY_ITEMS } from "@/lib/gallery-defaults"
 import type { GalleryItem } from "@/lib/gallery-types"
+import { useLocaleContext } from "@/components/locale-provider"
 
 export default function Gallery() {
+  const { dictionary } = useLocaleContext()
+  const galleryCopy = dictionary.gallery
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(DEFAULT_GALLERY_ITEMS)
   const [selectedItem, setSelectedItem] = useState<number | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
@@ -126,15 +129,14 @@ export default function Gallery() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          Gallery
+          {galleryCopy.title}
         </h2>
         <p
           className={`text-center text-gray-600 mb-8 max-w-2xl mx-auto transition-all duration-700 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          Take a visual tour of Sharky&apos;s Bar. Explore our welcoming interior, harbour views, delicious food, and
-          vibrant atmosphere.
+          {galleryCopy.description}
         </p>
 
         <div
@@ -217,7 +219,7 @@ export default function Gallery() {
             onClick={nextPage}
             className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/30"
           >
-            View More Photos
+            {galleryCopy.viewMore}
           </Button>
         </div>
       </div>
